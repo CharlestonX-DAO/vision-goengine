@@ -4,28 +4,6 @@
              alt="Cocos Creator Logo">
     </a>
 </p>
-<p align="center">
-    <a href="https://github.com/cocos/cocos-engine/stargazers">
-        <img src="https://img.shields.io/github/stars/cocos/cocos-engine.svg?style=flat-square&colorB=4183c4"
-             alt="stars">
-    </a>
-    <a href="https://github.com/cocos-creator/engine/network">
-        <img src="https://img.shields.io/github/forks/cocos/cocos-engine.svg?style=flat-square&colorB=4183c4"
-             alt="forks">
-    </a>
-    <a href="https://github.com/cocos-creator/engine/releases">
-        <img src="https://img.shields.io/github/tag/cocos/cocos-engine.svg?label=version&style=flat-square&colorB=4183c4"
-             alt="version">
-    </a>
-    <a href="./licenses/LICENSE">
-        <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square&colorB=4183c4"
-             alt="license">
-    </a>
-    <a href="https://twitter.com/CocosEngine">
-        <img src="https://img.shields.io/twitter/follow/CocosEngine.svg?logo=twitter&label=follow&style=flat-square&colorB=4183c4"
-             alt="twitter">
-    </a>
-</p>
 
 # Engine for Cocos Creator
 
