@@ -1,37 +1,17 @@
-/*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
 
- https://www.cocos.com/
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
- worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
- not use Cocos Creator software for developing other software or tools that's
- used for developing games. You are not granted to publish, distribute,
- sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
 
 /**
  * @packageDocumentation
  * @module geometry
  */
 
+import { JSB } from 'internal:constants';
 import { Mat3, Mat4, Quat, Vec3 } from '../math';
 import enums from './enums';
 import { IVec3, IVec3Like } from '../math/type-define';
 import { Sphere } from './sphere';
+import { AABBHandle, AABBPool, AABBView, NULL_HANDLE } from '../renderer/core/memory-pools';
+import { NativeAABB } from '../renderer/native-scene';
 import { Frustum } from './frustum';
 
 const _v3_tmp = new Vec3();
@@ -213,11 +193,27 @@ export class AABB {
     }
 
     protected readonly _type: number;
+    protected _aabbHandle: AABBHandle = NULL_HANDLE;
+    protected declare _nativeObj: NativeAABB;
     constructor (px = 0, py = 0, pz = 0, hw = 1, hh = 1, hl = 1) {
         this._type = enums.SHAPE_AABB;
-
+        if (JSB) {
+            // new aabb
+            this._aabbHandle = AABBPool.alloc();
+            this.center = new Vec3(AABBPool.getTypedArray(this._aabbHandle, AABBView.CENTER) as any);
+            this.halfExtents = new Vec3(AABBPool.getTypedArray(this._aabbHandle, AABBView.HALFEXTENTS) as any);
+            this.center.set(px, py, pz);
+            this.halfExtents.set(hw, hh, hl);
+            this._nativeObj = new NativeAABB();
+            this._nativeObj.initWithData(AABBPool.getBuffer(this._aabbHandle));
+            return;
+        }
         this.center = new Vec3(px, py, pz);
         this.halfExtents = new Vec3(hw, hh, hl);
+    }
+
+    get native (): NativeAABB {
+        return this._nativeObj;
     }
 
     /**

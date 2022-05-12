@@ -1,32 +1,11 @@
-/*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
 
- https://www.cocos.com/
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
- worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
- not use Cocos Creator software for developing other software or tools that's
- used for developing games. You are not granted to publish, distribute,
- sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
-
+import { JSB } from 'internal:constants';
 import { legacyCC } from '../../global-exports';
 import { Vec3 } from '../../math';
 import { Ambient } from './ambient';
 import { Light, LightType } from './light';
+import { NativeDirectionalLight } from '../native-scene';
 import { PCFType, Shadows } from './shadows';
 
 const _forward = new Vec3(0, 0, -1);
@@ -56,6 +35,9 @@ export class DirectionalLight extends Light {
 
     set direction (dir: Vec3) {
         Vec3.normalize(this._dir, dir);
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setDirection(dir);
+        }
     }
 
     get direction (): Vec3 {
@@ -85,6 +67,9 @@ export class DirectionalLight extends Light {
     }
     set illuminanceHDR (value: number) {
         this._illuminanceHDR = value;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setIlluminanceHDR(value);
+        }
     }
 
     get illuminanceLDR () {
@@ -92,6 +77,9 @@ export class DirectionalLight extends Light {
     }
     set illuminanceLDR (value: number) {
         this._illuminanceLDR = value;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setIlluminanceLDR(value);
+        }
     }
 
     /**
@@ -103,6 +91,9 @@ export class DirectionalLight extends Light {
     }
     set shadowEnabled (val) {
         this._shadowEnabled = val;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowEnabled(val);
+        }
     }
 
     /**
@@ -114,6 +105,9 @@ export class DirectionalLight extends Light {
     }
     set shadowPcf (val) {
         this._shadowPcf = val;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowPcf(val);
+        }
     }
 
     /**
@@ -125,6 +119,9 @@ export class DirectionalLight extends Light {
     }
     set shadowBias (val) {
         this._shadowBias = val;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowBias(val);
+        }
     }
 
     /**
@@ -136,6 +133,9 @@ export class DirectionalLight extends Light {
     }
     set shadowNormalBias (val: number) {
         this._shadowNormalBias = val;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowNormalBias(val);
+        }
     }
 
     /**
@@ -147,6 +147,9 @@ export class DirectionalLight extends Light {
     }
     set shadowSaturation (val: number) {
         this._shadowSaturation = val;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowSaturation(this._shadowSaturation);
+        }
     }
 
     /**
@@ -158,6 +161,9 @@ export class DirectionalLight extends Light {
     }
     set shadowDistance (val) {
         this._shadowDistance = Math.min(val, Shadows.MAX_FAR);
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowDistance(val);
+        }
     }
 
     /**
@@ -169,6 +175,9 @@ export class DirectionalLight extends Light {
     }
     set shadowInvisibleOcclusionRange (val) {
         this._shadowInvisibleOcclusionRange = Math.min(val, Shadows.MAX_FAR);
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowInvisibleOcclusionRange(val);
+        }
     }
 
     /**
@@ -180,6 +189,9 @@ export class DirectionalLight extends Light {
     }
     set shadowFixedArea (val) {
         this._shadowFixedArea = val;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowFixedArea(val);
+        }
     }
 
     /**
@@ -191,6 +203,9 @@ export class DirectionalLight extends Light {
     }
     set shadowNear (val) {
         this._shadowNear = val;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowNear(val);
+        }
     }
 
     /**
@@ -202,6 +217,9 @@ export class DirectionalLight extends Light {
     }
     set shadowFar (val) {
         this._shadowFar = Math.min(val, Shadows.MAX_FAR);
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowFar(val);
+        }
     }
 
     /**
@@ -213,6 +231,9 @@ export class DirectionalLight extends Light {
     }
     set shadowOrthoSize (val) {
         this._shadowOrthoSize = val;
+        if (JSB) {
+            (this._nativeObj as NativeDirectionalLight).setShadowOrthoSize(val);
+        }
     }
 
     constructor () {

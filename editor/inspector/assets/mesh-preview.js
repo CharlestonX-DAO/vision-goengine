@@ -55,20 +55,16 @@ exports.$ = {
     maxPosLabel: '.maxPosLabel',
 };
 
-async function callMeshPreviewFunction(funcName, ...args) {
-    return await Editor.Message.request('scene', 'call-preview-function', 'scene:mesh-preview', funcName, ...args);
-}
-
 const Elements = {
     preview: {
         ready() {
             const panel = this;
 
             panel.$.canvas.addEventListener('mousedown', async (event) => {
-                await callMeshPreviewFunction('onMouseDown', { x: event.x, y: event.y });
+                await Editor.Message.request('scene', 'on-mesh-preview-mouse-down', { x: event.x, y: event.y });
 
                 async function mousemove(event) {
-                    await callMeshPreviewFunction('onMouseMove', {
+                    await Editor.Message.request('scene', 'on-mesh-preview-mouse-move', {
                         movementX: event.movementX,
                         movementY: event.movementY,
                     });
@@ -77,7 +73,7 @@ const Elements = {
                 }
 
                 async function mouseup(event) {
-                    await callMeshPreviewFunction('onMouseUp', {
+                    await Editor.Message.request('scene', 'on-mesh-preview-mouse-up', {
                         x: event.x,
                         y: event.y,
                     });
@@ -113,7 +109,7 @@ const Elements = {
             }
 
             await panel.glPreview.init({ width: panel.$.canvas.clientWidth, height: panel.$.canvas.clientHeight });
-            const info = await callMeshPreviewFunction('setMesh', panel.asset.uuid);
+            const info = await Editor.Message.request('scene', 'set-mesh-preview-mesh', panel.asset.uuid);
             panel.infoUpdate(info);
             panel.refreshPreview();
         },
@@ -165,7 +161,7 @@ const Elements = {
             panel.isPreviewDataDirty = true;
         },
         close() {
-            callMeshPreviewFunction('hide');
+            Editor.Message.request('scene', 'hide-mesh-preview');
         },
     },
 };

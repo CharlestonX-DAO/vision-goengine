@@ -41,20 +41,16 @@ exports.$ = {
     canvas: '.canvas',
 };
 
-async function callSkeletonPreviewFunction(funcName, ...args) {
-    return await Editor.Message.request('scene', 'call-preview-function', 'scene:skeleton-preview', funcName, ...args);
-}
-
 const Elements = {
     preview: {
         ready() {
             const panel = this;
 
             panel.$.canvas.addEventListener('mousedown', async (event) => {
-                await callSkeletonPreviewFunction('onMouseDown', { x: event.x, y: event.y });
+                await Editor.Message.request('scene', 'on-skeleton-preview-mouse-down', { x: event.x, y: event.y });
 
                 async function mousemove(event) {
-                    await callSkeletonPreviewFunction('onMouseMove', {
+                    await Editor.Message.request('scene', 'on-skeleton-preview-mouse-move', {
                         movementX: event.movementX,
                         movementY: event.movementY,
                     });
@@ -63,7 +59,7 @@ const Elements = {
                 }
 
                 async function mouseup(event) {
-                    await callSkeletonPreviewFunction('onMouseUp', {
+                    await Editor.Message.request('scene', 'on-skeleton-preview-mouse-up', {
                         x: event.x,
                         y: event.y,
                     });
@@ -100,7 +96,7 @@ const Elements = {
             }
 
             await panel.glPreview.init({ width: panel.$.canvas.clientWidth, height: panel.$.canvas.clientHeight });
-            const info = await callSkeletonPreviewFunction('setSkeleton', panel.asset.uuid);
+            const info = await Editor.Message.request('scene', 'set-skeleton-preview-skeleton', panel.asset.uuid);
             panel.infoUpdate(info);
             panel.refreshPreview();
         },
@@ -128,7 +124,7 @@ const Elements = {
             panel.isPreviewDataDirty = true;
         },
         close() {
-            callSkeletonPreviewFunction('hide');
+            Editor.Message.request('scene', 'hide-skeleton-preview');
         },
     },
 };

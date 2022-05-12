@@ -446,7 +446,6 @@ export interface IAnimInfo {
     buffer: Buffer;
     data: Float32Array;
     dirty: boolean;
-    dirtyForJSB: Uint8Array;
     currentClip: AnimationClip | null;
 }
 
@@ -470,8 +469,8 @@ export class JointAnimationInfo {
         ));
         const data = new Float32Array([0, 0, 0, 0]);
         buffer.update(data);
-        const info = { buffer, data, dirty: false, dirtyForJSB: new Uint8Array([0]), currentClip: null };
-
+        const info: IAnimInfo = { buffer, data, dirty: false, currentClip: null };
+        this._setAnimInfoDirty(info, false);
         this._pool.set(nodeID, info);
         return info;
     }
@@ -483,14 +482,25 @@ export class JointAnimationInfo {
         this._pool.delete(nodeID);
     }
 
+    private _setAnimInfoDirty (info: IAnimInfo, value: boolean) {
+        info.dirty = value;
+        if (JSB) {
+            const key = 'nativeDirty';
+            const convertVal = value ? 1 : 0;
+            if (!info[key]) {
+                // In order to share dirty data with native
+                Object.defineProperty(info, key, { value: new Uint32Array(1).fill(convertVal), enumerable: true });
+                return;
+            }
+            info[key].fill(convertVal);
+        }
+    }
+
     public switchClip (info: IAnimInfo, clip: AnimationClip | null) {
         info.currentClip = clip;
         info.data[0] = -1;
         info.buffer.update(info.data);
-        info.dirty = false;
-        if (JSB) {
-            info.dirtyForJSB[0] = 0;
-        }
+        this._setAnimInfoDirty(info, false);
         return info;
     }
 

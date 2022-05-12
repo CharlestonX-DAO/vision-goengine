@@ -36,9 +36,8 @@ import { PerfCounter } from './perf-counter';
 import { legacyCC } from '../core/global-exports';
 import { Pass } from '../core/renderer';
 import { preTransforms } from '../core/math/mat4';
-import { JSB } from '../core/default-constants';
 import { Root } from '../core/root';
-import { PipelineRuntime } from '../core/pipeline/custom/pipeline';
+import { RenderPipeline } from '../core';
 
 const _characters = '0123456789. ';
 
@@ -72,7 +71,7 @@ interface IProfilerState {
 }
 
 const _profileInfo = {
-    fps: { desc: `Framerate (FPS)`, below: 30, average: _average, isInteger: true },
+    fps: { desc: 'Framerate (FPS)', below: 30, average: _average, isInteger: true },
     draws: { desc: 'Draw call', isInteger: true },
     frame: { desc: 'Frame time (ms)', min: 0, max: 50, average: _average },
     instances: { desc: 'Instance Count', isInteger: true },
@@ -94,7 +93,7 @@ const _constants = {
 
 export class Profiler {
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _stats: IProfilerState | null = null;
     public id = '__Profiler__';
@@ -104,7 +103,7 @@ export class Profiler {
     private _rootNode: Node | null = null;
     private _device: Device | null = null;
     private _swapchain: Swapchain | null = null;
-    private _pipeline: PipelineRuntime = null!;
+    private _pipeline: RenderPipeline = null!;
     private _meshRenderer: MeshRenderer = null!;
     private readonly _canvas: HTMLCanvasElement | null = null;
     private readonly _ctx: CanvasRenderingContext2D | null = null;
@@ -421,8 +420,8 @@ export class Profiler {
                 this.offsetData[3] = surfaceTransform;
             }
 
-            // @ts-expect-error using private members for efficiency.
-            this.pass._rootBufferDirty = true;
+            // @ts-expect-error using private members for efficiency
+            this.pass._setRootBufferDirty(true);
         }
 
         if (this._meshRenderer.model) this._pipeline.profiler = this._meshRenderer.model;

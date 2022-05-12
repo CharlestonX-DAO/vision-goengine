@@ -29,16 +29,17 @@
  */
 
 import { ccclass, serializable, editable } from 'cc.decorator';
-import { EDITOR, TEST } from 'internal:constants';
+import { EDITOR, JSB, TEST } from 'internal:constants';
 import { CCObject } from '../data/object';
 import { Mat4, Quat, Vec3 } from '../math';
 import { assert, getError } from '../platform/debug';
-import { RenderScene } from '../renderer/scene/render-scene';
+import { RenderScene } from '../renderer/core/render-scene';
 import { BaseNode } from './base-node';
 import { legacyCC } from '../global-exports';
 import { Component } from '../components/component';
 import { SceneGlobals } from './scene-globals';
 import { applyTargetOverrides, expandNestedPrefabInstanceNode } from '../utils/prefab/utils';
+import { NativeScene } from '../renderer/native-scene';
 
 /**
  * @en
@@ -75,7 +76,7 @@ export class Scene extends BaseNode {
      * @en Per-scene level rendering info
      * @zh 场景级别的渲染信息
      *
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     @serializable
     public _globals = new SceneGlobals();
@@ -99,6 +100,8 @@ export class Scene extends BaseNode {
 
     protected _dirtyFlags = 0;
 
+    protected declare _nativeObj: NativeScene | null;
+
     protected _lpos = Vec3.ZERO;
 
     protected _lrot = Quat.IDENTITY;
@@ -109,6 +112,16 @@ export class Scene extends BaseNode {
         this._scene = this;
     }
 
+    get native (): any {
+        return this._nativeObj;
+    }
+
+    protected _init () {
+        if (JSB) {
+            this._nativeObj = new NativeScene();
+        }
+    }
+
     constructor (name: string) {
         super(name);
         this._activeInHierarchy = false;
@@ -116,6 +129,7 @@ export class Scene extends BaseNode {
             this._renderScene = legacyCC.director.root.createScene({});
         }
         this._inited = legacyCC.game ? !legacyCC.game._isCloning : true;
+        this._init();
     }
 
     /**
@@ -151,12 +165,12 @@ export class Scene extends BaseNode {
     }
 
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _onHierarchyChanged () { }
 
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _onBatchCreated (dontSyncChildPrefab: boolean) {
         super._onBatchCreated(dontSyncChildPrefab);
@@ -288,6 +302,9 @@ export class Scene extends BaseNode {
         // The test environment does not currently support the renderer
         if (!TEST) {
             this._globals.activate();
+            if (this._renderScene) {
+                this._renderScene.activate();
+            }
         }
     }
 }

@@ -61,7 +61,7 @@ export class PassInstance extends Pass {
             const parentBlock = this._parent.blocks[u.binding];
             block.set(parentBlock);
         }
-        this._rootBufferDirty = true;
+        this._setRootBufferDirty(true);
         const paren = this._parent as PassInstance;
         for (let i = 0; i < this._shaderInfo.samplerTextures.length; i++) {
             const u = this._shaderInfo.samplerTextures[i];
@@ -121,11 +121,11 @@ export class PassInstance extends Pass {
 
     protected _syncBatchingScheme () {
         this._defines.USE_BATCHING = this._defines.USE_INSTANCING = false;
-        this._batchingScheme = BatchingSchemes.NONE;
+        this._setBatchingScheme(BatchingSchemes.NONE);
     }
 
     protected _onStateChange () {
-        this._hash = Pass.getPassHash(this);
+        this._setHash(Pass.getPassHash(this));
         this._owner.onPassStateChange(this._dontNotify);
     }
 }

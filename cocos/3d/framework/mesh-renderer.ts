@@ -375,14 +375,6 @@ export class MeshRenderer extends RenderableComponent {
         }
     }
 
-    public onGeometryChanged () {
-        if (this._model && this._mesh) {
-            this._model.createBoundingShape(this._mesh.struct.minPosition, this._mesh.struct.maxPosition);
-            this._model.updateWorldBound();
-            this._model.onGeometryChanged();
-        }
-    }
-
     /**
      * @zh 获取子网格指定外形的权重。
      * @en Gets the weight at specified shape of specified sub mesh.
@@ -460,7 +452,7 @@ export class MeshRenderer extends RenderableComponent {
     }
 
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _updateLightmap (lightmap: Texture2D|null, uOff: number, vOff: number, scale: number, lum: number) {
         this.lightmapSettings.texture = lightmap;

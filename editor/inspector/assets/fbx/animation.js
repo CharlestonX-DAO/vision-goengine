@@ -652,10 +652,6 @@ exports.close = function() {
     }
 };
 
-async function callModelPreviewFunction(funcName, ...args) {
-    return await Editor.Message.request('scene', 'call-preview-function', 'scene:model-preview', funcName, ...args);
-}
-
 exports.methods = {
     /** animation name -> uuid */
     initAnimationNameToUUIDMap() {
@@ -1062,7 +1058,9 @@ exports.methods = {
 
         const wrapMode = Number(event.target.value);
         panel.animationInfos[panel.rawClipIndex].splits[panel.splitClipIndex].wrapMode = wrapMode;
-        callModelPreviewFunction(
+        Editor.Message.request(
+            'scene',
+            'execute-model-preview-animation-operation',
             'setClipConfig',
             {
                 wrapMode,
@@ -1076,7 +1074,9 @@ exports.methods = {
 
         const speed = Number(event.target.value);
         panel.animationInfos[panel.rawClipIndex].splits[panel.splitClipIndex].speed = speed;
-        callModelPreviewFunction(
+        Editor.Message.request(
+            'scene',
+            'execute-model-preview-animation-operation',
             'setClipConfig',
             {
                 speed,

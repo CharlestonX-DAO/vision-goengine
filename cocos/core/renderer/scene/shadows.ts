@@ -1,35 +1,14 @@
-/*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
 
- https://www.cocos.com/
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
- worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
- not use Cocos Creator software for developing other software or tools that's
- used for developing games. You are not granted to publish, distribute,
- sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
-
+import { JSB } from 'internal:constants';
 import { Material } from '../../assets/material';
 import { Sphere } from '../../geometry';
 import { Color, Mat4, Vec3, Vec2 } from '../../math';
 import { legacyCC } from '../../global-exports';
 import { Enum } from '../../value-types';
-import { ShadowsInfo } from '../../scene-graph/scene-globals';
+import type { ShadowsInfo } from '../../scene-graph/scene-globals';
 import { IMacroPatch } from '../core/pass';
+import { NativeShadow } from '../native-scene';
 import { Shader } from '../../gfx';
 
 /**
@@ -144,7 +123,7 @@ export class Shadows {
     }
 
     set enabled (val: boolean) {
-        this._enabled = val;
+        this._setEnable(val);
         this.activate();
     }
 
@@ -156,7 +135,7 @@ export class Shadows {
         return this._type;
     }
     set type (val: number) {
-        this._type = this.enabled ? val : SHADOW_TYPE_NONE;
+        this._setType(val);
         this.activate();
     }
 
@@ -170,6 +149,9 @@ export class Shadows {
 
     set normal (val: Vec3) {
         Vec3.copy(this._normal, val);
+        if (JSB) {
+            this._nativeObj!.normal = this._normal;
+        }
     }
 
     /**
@@ -182,6 +164,9 @@ export class Shadows {
 
     set distance (val: number) {
         this._distance = val;
+        if (JSB) {
+            this._nativeObj!.distance = val;
+        }
     }
 
     /**
@@ -194,6 +179,9 @@ export class Shadows {
 
     set shadowColor (color: Color) {
         this._shadowColor = color;
+        if (JSB) {
+            this._nativeObj!.color = color;
+        }
     }
 
     /**
@@ -205,6 +193,9 @@ export class Shadows {
     }
     public set size (val: Vec2) {
         this._size.set(val);
+        if (JSB) {
+            this._nativeObj!.size = val;
+        }
     }
 
     /**
@@ -216,6 +207,9 @@ export class Shadows {
     }
     public set shadowMapDirty (val: boolean) {
         this._shadowMapDirty = val;
+        if (JSB) {
+            this._nativeObj!.shadowMapDirty = val;
+        }
     }
 
     public get matLight () {
@@ -243,15 +237,12 @@ export class Shadows {
     public maxReceived = 4;
 
     // local set
+    public firstSetCSM = false;
     public shadowCameraFar = 0;
     public matShadowView = new Mat4();
     public matShadowProj = new Mat4();
     public matShadowViewProj = new Mat4();
-    protected _matLight = new Mat4();
-    protected _material: Material | null = null;
-    protected _instancingMaterial: Material | null = null;
 
-    // public properties of shadow
     protected _enabled = false;
     protected _type = SHADOW_TYPE_NONE;
     protected _distance = 0;
@@ -260,10 +251,29 @@ export class Shadows {
     protected _size: Vec2 = new Vec2(512, 512);
     protected _shadowMapDirty = false;
 
+    protected _matLight = new Mat4();
+    protected _material: Material | null = null;
+    protected _instancingMaterial: Material | null = null;
+
+    protected declare _nativeObj: NativeShadow | null;
+
+    get native (): NativeShadow {
+        return this._nativeObj!;
+    }
+
+    constructor () {
+        if (JSB) {
+            this._nativeObj = new NativeShadow();
+        }
+    }
+
     public getPlanarShader (patches: IMacroPatch[] | null): Shader | null {
         if (!this._material) {
             this._material = new Material();
             this._material.initialize({ effectName: 'planar-shadow' });
+            if (JSB) {
+                this._nativeObj!.planarPass = this._material.passes[0].native;
+            }
         }
 
         return this._material.passes[0].getShaderVariant(patches);
@@ -273,14 +283,32 @@ export class Shadows {
         if (!this._instancingMaterial) {
             this._instancingMaterial = new Material();
             this._instancingMaterial.initialize({ effectName: 'planar-shadow', defines: { USE_INSTANCING: true } });
+            if (JSB) {
+                this._nativeObj!.instancePass = this._instancingMaterial.passes[0].native;
+            }
         }
 
         return this._instancingMaterial.passes[0].getShaderVariant(patches);
     }
 
+    private _setEnable (val: boolean) {
+        this._enabled = val;
+        if (JSB) {
+            this._nativeObj!.enabled = val;
+            if (!val) this._setType(SHADOW_TYPE_NONE);
+        }
+    }
+
+    private _setType (val) {
+        this._type = this.enabled ? val : SHADOW_TYPE_NONE;
+        if (JSB) {
+            this._nativeObj!.shadowType = this._type;
+        }
+    }
+
     public initialize (shadowsInfo: ShadowsInfo) {
-        this._enabled = shadowsInfo.enabled;
-        this._type = this.enabled ? shadowsInfo.type : SHADOW_TYPE_NONE;
+        this._setEnable(shadowsInfo.enabled);
+        this._setType(shadowsInfo.type);
 
         this.normal = shadowsInfo.planeDirection;
         this.distance = shadowsInfo.planeHeight;
@@ -301,14 +329,27 @@ export class Shadows {
         if (!this._material) {
             this._material = new Material();
             this._material.initialize({ effectName: 'planar-shadow' });
+            if (JSB) {
+                this._nativeObj!.planarPass = this._material.passes[0].native;
+            }
         }
         if (!this._instancingMaterial) {
             this._instancingMaterial = new Material();
             this._instancingMaterial.initialize({ effectName: 'planar-shadow', defines: { USE_INSTANCING: true } });
+            if (JSB) {
+                this._nativeObj!.instancePass = this._instancingMaterial.passes[0].native;
+            }
+        }
+    }
+
+    protected _destroy () {
+        if (JSB) {
+            this._nativeObj = null;
         }
     }
 
     public destroy () {
+        this._destroy();
         if (this._material) {
             this._material.destroy();
         }

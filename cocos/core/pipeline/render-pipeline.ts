@@ -1,27 +1,4 @@
-/*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
 
- https://www.cocos.com/
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
- worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
- not use Cocos Creator software for developing other software or tools that's
- used for developing games. You are not granted to publish, distribute,
- sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
 
 /**
  * @packageDocumentation
@@ -44,6 +21,7 @@ import { Camera, SKYBOX_FLAG } from '../renderer/scene/camera';
 import { Model } from '../renderer/scene/model';
 import { Root } from '../root';
 import { GlobalDSManager } from './global-descriptor-set-manager';
+import { GeometryRenderer } from './geometry-renderer';
 import { PipelineSceneData } from './pipeline-scene-data';
 import { PipelineUBO } from './pipeline-ubo';
 import { RenderFlow } from './render-flow';
@@ -51,7 +29,6 @@ import { IPipelineEvent, PipelineEventProcessor, PipelineEventType } from './pip
 import { decideProfilerCamera } from './pipeline-funcs';
 import { OS } from '../../../pal/system-info/enum-type';
 import { macro } from '../platform/macro';
-import { PipelineRuntime } from './custom/pipeline';
 
 /**
  * @en Render pipeline information descriptor
@@ -107,7 +84,7 @@ export class PipelineInputAssemblerData {
  * 渲染流程函数 [[render]] 会由 [[Root]] 发起调用并对所有 [[Camera]] 执行预设的渲染流程。
  */
 @ccclass('cc.RenderPipeline')
-export abstract class RenderPipeline extends Asset implements IPipelineEvent, PipelineRuntime {
+export abstract class RenderPipeline extends Asset implements IPipelineEvent {
     /**
      * @en The tag of pipeline.
      * @zh 管线的标签。
@@ -226,6 +203,10 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent, Pi
         return this._profiler;
     }
 
+    get geometryRenderer () {
+        return this._geometryRenderer;
+    }
+
     set clusterEnabled (value) {
         this._clusterEnabled = value;
     }
@@ -250,6 +231,7 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent, Pi
     protected _macros: MacroRecord = {};
     protected _constantMacros = '';
     protected _profiler: Model | null = null;
+    protected _geometryRenderer = new GeometryRenderer();
     protected declare _pipelineSceneData: PipelineSceneData;
     protected _pipelineRenderData: PipelineRenderData | null = null;
     protected _renderPasses = new Map<ClearFlags, RenderPass>();
@@ -370,17 +352,6 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent, Pi
         return out;
     }
 
-    public get shadingScale () {
-        return this._pipelineSceneData.shadingScale;
-    }
-
-    public set shadingScale (val: number) {
-        if (this._pipelineSceneData.shadingScale !== val) {
-            this._pipelineSceneData.shadingScale = val;
-            this.emit(PipelineEventType.ATTACHMENT_SCALE_CAHNGED, val);
-        }
-    }
-
     /**
      * @en Activate the render pipeline after loaded, it mainly activate the flows
      * @zh 当渲染管线资源加载完成后，启用管线，主要是启用管线内的 flow
@@ -391,13 +362,14 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent, Pi
         const root = legacyCC.director.root as Root;
         this._device = root.device;
         this._generateConstantMacros();
-        this._globalDSManager = new GlobalDSManager(this._device);
+        this._globalDSManager = new GlobalDSManager(this);
         this._descriptorSet = this._globalDSManager.globalDescriptorSet;
         this._pipelineUBO.activate(this._device, this);
         // update global defines in advance here for deferred pipeline may tryCompile shaders.
         this._macros.CC_USE_HDR = this._pipelineSceneData.isHDR;
         this._generateConstantMacros();
-        this._pipelineSceneData.activate(this._device);
+        this._pipelineSceneData.activate(this._device, this);
+        this._geometryRenderer.activate(this._device, this);
 
         for (let i = 0; i < this._flows.length; i++) {
             this._flows[i].activate(this);
@@ -650,12 +622,9 @@ export abstract class RenderPipeline extends Asset implements IPipelineEvent, Pi
         this._commandBuffers.length = 0;
         this._pipelineUBO.destroy();
         this._pipelineSceneData?.destroy();
+        this._geometryRenderer.destroy();
 
         return super.destroy();
-    }
-
-    public onGlobalPipelineStateChanged () {
-        // do nothing
     }
 
     protected _generateConstantMacros () {

@@ -19,14 +19,13 @@ import { legacyCC, VERSION } from './global-exports';
 import { IPhysicsConfig } from '../physics/framework/physics-config';
 import { bindingMappingInfo } from './pipeline/define';
 import { SplashScreen } from './splash-screen';
-import { RenderPipeline } from './pipeline/render-pipeline';
+import { RenderPipeline } from './pipeline';
 import { Node } from './scene-graph/node';
 import { BrowserType } from '../../pal/system-info/enum-type';
 import { Layers } from './scene-graph';
 import { log2 } from './math/bits';
 import { garbageCollectionManager } from './data/garbage-collection';
 import { screen } from './platform/screen';
-import { builtinResMgr } from './builtin/builtin-res-mgr';
 
 interface ISceneInfo {
     url: string;
@@ -367,25 +366,25 @@ export class Game extends EventTarget {
     public groupList: any[] = [];
 
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _persistRootNodes = {};
 
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _gfxDevice: Device | null = null;
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _swapchain: Swapchain | null = null;
     // states
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _configLoaded = false; // whether config loaded
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _isCloning = false;    // deserializing or instantiating
     private _inited = false;
@@ -619,17 +618,15 @@ export class Game extends EventTarget {
         }
         garbageCollectionManager.init();
 
-        return Promise.resolve(initPromise)
-            .then(() => Promise.resolve(builtinResMgr.initBuiltinRes(this._gfxDevice!)))
-            .then(() => this._setRenderPipelineNShowSplash()).then(() => {
-                if (!HTML5) {
-                    // @ts-expect-error access private method.
-                    screen._init({
-                        configOrientation: 'auto',
-                        exactFitScreen: true,
-                    });
-                }
-            });
+        return Promise.resolve(initPromise).then(() => this._setRenderPipelineNShowSplash()).then(() => {
+            if (!HTML5) {
+                // @ts-expect-error access private method.
+                screen._init({
+                    configOrientation: 'auto',
+                    exactFitScreen: true,
+                });
+            }
+        });
     }
 
     //  @ Persist root node section

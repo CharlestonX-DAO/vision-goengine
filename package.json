@@ -1,10 +1,12 @@
 {
-  "name": "vision-goengine",
-  "version": "0.1.0",
-  "description": "Vision Goengine is a cross-platform 2D & 3D game engine written in TypeScript, licensed under MIT.",
-  "homepage": "https://github.com/vision-consensus/vision-goengine",
+  "name": "cocos-creator",
+  "version": "3.5.0",
+  "description": "Cocos Creator is a cross-platform 2D & 3D game engine written in TypeScript, licensed under MIT.",
+  "homepage": "http://www.cocos.com",
   "license": "MIT",
-  "authors": [],
+  "authors": [
+    "AUTHORS.txt"
+  ],
   "module": "index.js",
   "scripts": {
     "server": "http-server . -p 8002 -o playground/index.html",
@@ -21,18 +23,17 @@
     "clear-platform": "node ./native/utils/clear-platform.js",
     "update:native-external": "node ./native/utils/update-external.js",
     "test": "gulp test",
-    "install:typedoc-plugin": "cd ./scripts/typedoc-plugin && npm install"
+    "install:typedoc-plugin": "cd ./scripts/typedoc-plugin && npm install --only=production"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vision-consensus/vision-goengine.git"
+    "url": "git+https://github.com/cocos-creator/engine.git"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/preset-env": "7.8.7",
     "@cocos/babel-preset-cc": "2.2.0",
     "@cocos/build-engine": "4.2.21-beta.7",
-    "@cocos/typedoc-plugin-localization": "^1.0.0",
     "@types/fs-extra": "^5.0.4",
     "@types/jest": "^24.9.1",
     "@types/yargs": "^12.0.14",

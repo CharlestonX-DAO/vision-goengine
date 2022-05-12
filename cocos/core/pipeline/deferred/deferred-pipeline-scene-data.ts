@@ -1,34 +1,12 @@
-/*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
 
- https://www.cocos.com/
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
- worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
- not use Cocos Creator software for developing other software or tools that's
- used for developing games. You are not granted to publish, distribute,
- sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
-
+import { JSB } from 'internal:constants';
 import { Device } from '../../gfx';
-import { MAX_BLOOM_FILTER_PASS_NUM } from '../render-pipeline';
+import { RenderPipeline, MAX_BLOOM_FILTER_PASS_NUM } from '../render-pipeline';
 import { Material } from '../../assets';
 import { PipelineSceneData } from '../pipeline-scene-data';
 import { macro } from '../../platform/macro';
-import { legacyCC } from '../../global-exports';
+import { NativePass } from '../../renderer';
 
 // Anti-aliasing type, other types will be gradually added in the future
 export enum AntiAliasing {
@@ -84,7 +62,7 @@ export class DeferredPipelineSceneData extends PipelineSceneData {
     }
     protected declare _postprocessMaterial: Material;
 
-    public updatePipelineSceneData () {
+    public onGlobalPipelineStateChanged () {
         this.updatePipelinePassInfo();
     }
 
@@ -96,6 +74,8 @@ export class DeferredPipelineSceneData extends PipelineSceneData {
         prefilterPass.tryCompile();
         prefilterPass.endChangeStatesSilently();
 
+        const downsamplePasses : NativePass[] = [];
+        const upsamplePasses : NativePass[] = [];
         for (let i = 0; i < MAX_BLOOM_FILTER_PASS_NUM; ++i) {
             const downsamplePass = this._bloomMaterial.passes[BLOOM_DOWNSAMPLEPASS_INDEX + i];
             downsamplePass.beginChangeStatesSilently();
@@ -106,12 +86,26 @@ export class DeferredPipelineSceneData extends PipelineSceneData {
             upsamplePass.beginChangeStatesSilently();
             upsamplePass.tryCompile();
             upsamplePass.endChangeStatesSilently();
+
+            downsamplePasses.push(downsamplePass.native);
+            upsamplePasses.push(upsamplePass.native);
         }
 
         const combinePass = this._bloomMaterial.passes[BLOOM_COMBINEPASS_INDEX];
         combinePass.beginChangeStatesSilently();
         combinePass.tryCompile();
         combinePass.endChangeStatesSilently();
+
+        if (JSB) {
+            this._nativeObj!.bloomPrefilterPassShader = prefilterPass.getShaderVariant();
+            this._nativeObj!.bloomPrefilterPass = prefilterPass.native;
+            this._nativeObj!.bloomDownsamplePassShader = this._bloomMaterial.passes[BLOOM_DOWNSAMPLEPASS_INDEX].getShaderVariant();
+            this._nativeObj!.bloomDownsamplePass = downsamplePasses;
+            this._nativeObj!.bloomUpsamplePassShader = this._bloomMaterial.passes[BLOOM_UPSAMPLEPASS_INDEX].getShaderVariant();
+            this._nativeObj!.bloomUpsamplePass = upsamplePasses;
+            this._nativeObj!.bloomCombinePassShader = combinePass.getShaderVariant();
+            this._nativeObj!.bloomCombinePass = combinePass.native;
+        }
     }
 
     private updatePostProcessPass () {
@@ -121,6 +115,11 @@ export class DeferredPipelineSceneData extends PipelineSceneData {
         passPost.beginChangeStatesSilently();
         passPost.tryCompile();
         passPost.endChangeStatesSilently();
+
+        if (JSB) {
+            this._nativeObj!.pipelinePostPassShader = passPost.getShaderVariant();
+            this._nativeObj!.pipelinePostPass = passPost.native;
+        }
     }
 
     public initPipelinePassInfo () {
@@ -179,8 +178,8 @@ export class DeferredPipelineSceneData extends PipelineSceneData {
         this.updateDeferredPassInfo();
     }
 
-    public activate (device: Device) {
-        super.activate(device);
+    public activate (device: Device, pipeline: RenderPipeline) {
+        super.activate(device, pipeline);
         this.initPipelinePassInfo();
         return true;
     }
@@ -194,12 +193,17 @@ export class DeferredPipelineSceneData extends PipelineSceneData {
 
         // It's temporary solution for main light shadowmap
         if (this.shadows.enabled) {
-            legacyCC.director.root.pipeline.macros.CC_RECEIVE_SHADOW = 1;
+            this._pipeline.macros.CC_RECEIVE_SHADOW = 1;
         }
 
         const passLit = this._deferredLightingMaterial.passes[0];
         passLit.beginChangeStatesSilently();
         passLit.tryCompile();
         passLit.endChangeStatesSilently();
+
+        if (JSB) {
+            this._nativeObj!.deferredLightPassShader = passLit.getShaderVariant();
+            this._nativeObj!.deferredLightPass = passLit.native;
+        }
     }
 }

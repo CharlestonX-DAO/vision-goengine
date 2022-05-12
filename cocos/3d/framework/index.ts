@@ -1,6 +1,5 @@
 
 
-
 export { MeshRenderer } from './mesh-renderer';
 
 /** deprecated */

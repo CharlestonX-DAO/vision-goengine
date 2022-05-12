@@ -1,32 +1,11 @@
-/*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
 
- https://www.cocos.com/
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
- worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
- not use Cocos Creator software for developing other software or tools that's
- used for developing games. You are not granted to publish, distribute,
- sublicense, and/or sell copies of Cocos Creator.
-
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- */
-
+import { JSB } from 'internal:constants';
 import { Enum } from '../../value-types';
 import { Color, Vec4 } from '../../math';
 import { legacyCC } from '../../global-exports';
-import { FogInfo } from '../../scene-graph/scene-globals';
+import type { FogInfo } from '../../scene-graph/scene-globals';
+import { NativeFog } from '../native-scene';
 import { SRGBToLinear } from '../../pipeline/pipeline-funcs';
 
 const _v4 = new Vec4();
@@ -82,7 +61,7 @@ export class Fog {
      * @en Enable global fog
      */
     set enabled (val: boolean) {
-        this._enabled = val;
+        this._setEnable(val);
         if (!val) {
             this._type = FOG_TYPE_NONE;
             this._updatePipeline();
@@ -100,7 +79,7 @@ export class Fog {
      * @en Enable accurate fog (pixel fog)
      */
     set accurate (val: boolean) {
-        this._accurate = val;
+        this._setAccurate(val);
         this._updatePipeline();
     }
 
@@ -114,9 +93,11 @@ export class Fog {
      */
     set fogColor (val: Color) {
         this._fogColor.set(val);
-
         _v4.set(val.x, val.y, val.z, val.w);
         SRGBToLinear(this._colorArray, _v4);
+        if (JSB) {
+            this._nativeObj!.color = this._fogColor;
+        }
     }
 
     get fogColor () {
@@ -138,7 +119,7 @@ export class Fog {
         return this._type;
     }
     set type (val: number) {
-        this._type = this.enabled ? val : FOG_TYPE_NONE;
+        this._setType(val);
         if (this.enabled) this._updatePipeline();
     }
 
@@ -152,6 +133,9 @@ export class Fog {
 
     set fogDensity (val: number) {
         this._fogDensity = val;
+        if (JSB) {
+            this._nativeObj!.density = val;
+        }
     }
     /**
      * @zh 雾效起始位置，只适用于线性雾
@@ -163,6 +147,9 @@ export class Fog {
 
     set fogStart (val: number) {
         this._fogStart = val;
+        if (JSB) {
+            this._nativeObj!.start = val;
+        }
     }
 
     /**
@@ -175,6 +162,9 @@ export class Fog {
 
     set fogEnd (val: number) {
         this._fogEnd = val;
+        if (JSB) {
+            this._nativeObj!.end = val;
+        }
     }
 
     /**
@@ -187,6 +177,9 @@ export class Fog {
 
     set fogAtten (val: number) {
         this._fogAtten = val;
+        if (JSB) {
+            this._nativeObj!.atten = val;
+        }
     }
 
     /**
@@ -199,6 +192,9 @@ export class Fog {
 
     set fogTop (val: number) {
         this._fogTop = val;
+        if (JSB) {
+            this._nativeObj!.top = val;
+        }
     }
 
     /**
@@ -211,6 +207,9 @@ export class Fog {
 
     set fogRange (val: number) {
         this._fogRange = val;
+        if (JSB) {
+            this._nativeObj!.range = val;
+        }
     }
     get colorArray (): Readonly<Vec4> {
         return this._colorArray;
@@ -226,12 +225,44 @@ export class Fog {
     protected _fogAtten = 5;
     protected _fogTop = 1.5;
     protected _fogRange = 1.2;
+    protected declare _nativeObj: NativeFog | null;
+
+    get native (): NativeFog {
+        return this._nativeObj!;
+    }
+
+    constructor () {
+        if (JSB) {
+            this._nativeObj = new NativeFog();
+        }
+    }
+
+    protected _setType (val) {
+        this._type = this.enabled ? val : FOG_TYPE_NONE;
+        if (JSB) {
+            this._nativeObj!.type = this._type;
+        }
+    }
+
+    protected _setEnable (val) {
+        this._enabled = val;
+        if (JSB) {
+            this._nativeObj!.enabled = val;
+        }
+    }
+
+    protected _setAccurate (val) {
+        this._accurate = val;
+        if (JSB) {
+            this._nativeObj!.accurate = val;
+        }
+    }
 
     public initialize (fogInfo : FogInfo) {
         this.fogColor = fogInfo.fogColor;
-        this._enabled = fogInfo.enabled;
-        this._type = this.enabled ? fogInfo.type : FOG_TYPE_NONE;
-        this._accurate = fogInfo.accurate;
+        this._setEnable(fogInfo.enabled);
+        this._setAccurate(fogInfo.accurate);
+        this._setType(fogInfo.type);
         this.fogDensity = fogInfo.fogDensity;
         this.fogStart = fogInfo.fogStart;
         this.fogEnd = fogInfo.fogEnd;
@@ -255,6 +286,16 @@ export class Fog {
         pipeline.macros.CC_USE_FOG = value;
         pipeline.macros.CC_USE_ACCURATE_FOG = accurateValue;
         root.onGlobalPipelineStateChanged();
+    }
+
+    protected _destroy () {
+        if (JSB) {
+            this._nativeObj = null;
+        }
+    }
+
+    public destroy () {
+        this._destroy();
     }
 }
 

@@ -109,8 +109,8 @@ export const tiled: IAssembler = {
         // update indices
         const bid = chunk.bufferId;
         let vid = chunk.vertexOffset;
-        const meshBuffer = chunk.meshBuffer;
-        const ib = chunk.meshBuffer.iData;
+        const meshBuffer = chunk.vertexAccessor.getMeshBuffer(chunk.bufferId);
+        const ib = chunk.vertexAccessor.getIndexBuffer(bid);
         let indexOffset = meshBuffer.indexOffset;
         for (let i = 0; i < renderData.indexCount; i += 6) {
             ib[indexOffset++] = vid;

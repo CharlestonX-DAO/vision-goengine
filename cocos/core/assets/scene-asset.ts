@@ -16,7 +16,7 @@ import { legacyCC } from '../global-exports';
  *
  */
 @ccclass('cc.SceneAsset')
-export class SceneAsset extends Asset {
+export default class SceneAsset extends Asset {
     /**
      * @en The scene node
      * @zh 场景节点。

@@ -30,7 +30,7 @@
  */
 
 import { ccclass, type, serializable, editable, tooltip } from 'cc.decorator';
-import type { Node } from '../scene-graph';
+import { Node } from '../scene-graph';
 import { legacyCC } from '../global-exports';
 
 /**
@@ -64,7 +64,7 @@ import { legacyCC } from '../global-exports';
 @ccclass('cc.ClickEvent')
 export class EventHandler {
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     get _componentName () {
         this._genCompIdIfNeeded();
@@ -118,7 +118,7 @@ export class EventHandler {
     public component = '';
 
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     @serializable
     public _componentId = '';
@@ -198,3 +198,5 @@ export class EventHandler {
         }
     }
 }
+
+legacyCC.Component.EventHandler = EventHandler;

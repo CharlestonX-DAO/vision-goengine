@@ -2,8 +2,6 @@
 
 
 
-/* eslint-disable no-new-func */
-
 import { EDITOR, DEV } from 'internal:constants';
 import { getClassName, getset, isEmptyObject } from './js';
 import { legacyCC } from '../global-exports';
@@ -46,7 +44,7 @@ export function propertyDefine (ctor, sameNameGetSets, diffNameGetSets) {
     let propName; const np = ctor.prototype;
     for (let i = 0; i < sameNameGetSets.length; i++) {
         propName = sameNameGetSets[i];
-        const suffix = (propName[0].toUpperCase() as string) + (propName.slice(1) as string);
+        const suffix = propName[0].toUpperCase() + propName.slice(1);
         define(np, propName, `get${suffix}`, `set${suffix}`);
     }
     for (propName in diffNameGetSets) {
@@ -76,7 +74,7 @@ export function pushToMap (map, key, value, pushFront) {
 
 export function contains (refNode, otherNode) {
     if (typeof refNode.contains === 'function') {
-        return refNode.contains(otherNode) as boolean;
+        return refNode.contains(otherNode);
     } else if (typeof refNode.compareDocumentPosition === 'function') {
         return !!(refNode.compareDocumentPosition(otherNode) & 16);
     } else {
@@ -100,7 +98,7 @@ export function isDomNode (obj) {
         // it should because window.Node was overwritten.
         return obj instanceof Node;
     } else {
-        return !!obj
+        return obj
             && typeof obj === 'object'
             && typeof obj.nodeType === 'number'
             && typeof obj.nodeName === 'string';
@@ -108,7 +106,14 @@ export function isDomNode (obj) {
 }
 
 export function callInNextTick (callback, p1?: any, p2?: any) {
-    if (callback) {
+    if (EDITOR) {
+        if (callback) {
+            // @ts-expect-error
+            process.nextTick(() => {
+                callback(p1, p2);
+            });
+        }
+    } else if (callback) {
         setTimeout(() => {
             callback(p1, p2);
         }, 0);
@@ -117,7 +122,6 @@ export function callInNextTick (callback, p1?: any, p2?: any) {
 
 // use anonymous function here to ensure it will not being hoisted without EDITOR
 export function tryCatchFunctor_EDITOR (funcName) {
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
     return Function('target',
         `${'try {\n'
         + '  target.'}${funcName}();\n`
@@ -149,7 +153,7 @@ export function isPlainEmptyObj_DEV (obj) {
  * var v2 = clampf(-1, 0, 20); //  0;
  * var v3 = clampf(10, 0, 20); // 10;
  */
-export function clampf (value: number, min_inclusive: number, max_inclusive: number) {
+export function clampf (value, min_inclusive, max_inclusive) {
     if (min_inclusive > max_inclusive) {
         const temp = min_inclusive;
         min_inclusive = max_inclusive;
@@ -164,7 +168,7 @@ export function clampf (value: number, min_inclusive: number, max_inclusive: num
  * @param angle 角度
  * @return {Number}
  */
-export function degreesToRadians (angle: number) {
+export function degreesToRadians (angle) {
     return angle * macro.RAD;
 }
 
