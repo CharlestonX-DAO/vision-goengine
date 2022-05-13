@@ -1,1 +1,1 @@
-export * from '../cocos/3d';
+export * from '../vision/3d';

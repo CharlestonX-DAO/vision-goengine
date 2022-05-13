@@ -17,7 +17,7 @@ lightNode.parent = scene;
 lightNode.setRotationFromEuler(-40, 0, 0);
 lightNode.addComponent(cc.DirectionalLightComponent);
 
-// parsed effect file is embedded in cocos/3d/builtin/effects.js
+// parsed effect file is embedded in vision/3d/builtin/effects.js
 const material = new cc.Material();
 material.initialize({
   /* *

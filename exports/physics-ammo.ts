@@ -1,3 +1,3 @@
 
 
-import '../cocos/physics/bullet/instantiate';
+import '../vision/physics/bullet/instantiate';

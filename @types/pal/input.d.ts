@@ -1,5 +1,5 @@
 declare module 'pal/input' {
-    type TouchCallback = (res: import('cocos/input/types').EventTouch) => void;
+    type TouchCallback = (res: import('vision/input/types').EventTouch) => void;
     /**
      * Class designed for touch input.
      */
@@ -7,10 +7,10 @@ declare module 'pal/input' {
         /**
          * Register the touch event callback.
          */
-        public on (eventType: import('cocos/input/types/event-enum').InputEventType, callback: TouchCallback, target?: any);
+        public on (eventType: import('vision/input/types/event-enum').InputEventType, callback: TouchCallback, target?: any);
     }
 
-    type MouseCallback = (res: import('cocos/input/types').EventMouse) => void;
+    type MouseCallback = (res: import('vision/input/types').EventMouse) => void;
     /**
      * Class designed for mouse input.
      */
@@ -18,10 +18,10 @@ declare module 'pal/input' {
         /**
          * Register the mouse event callback.
          */
-        public on (eventType: import('cocos/input/types/event-enum').InputEventType, callback: MouseCallback, target?: any);
+        public on (eventType: import('vision/input/types/event-enum').InputEventType, callback: MouseCallback, target?: any);
     }
 
-    type KeyboardCallback = (res: import('cocos/input/types').EventKeyboard) => void;
+    type KeyboardCallback = (res: import('vision/input/types').EventKeyboard) => void;
     /**
      * Class Designed for keyboard input.
      */
@@ -29,7 +29,7 @@ declare module 'pal/input' {
         /**
          * Register the keyboard event callback.
          */
-        public on (eventType: import('cocos/input/types/event-enum').InputEventType, callback: KeyboardCallback, target?: any);
+        public on (eventType: import('vision/input/types/event-enum').InputEventType, callback: KeyboardCallback, target?: any);
     }
 
     /**
@@ -39,7 +39,7 @@ declare module 'pal/input' {
         // TODO: add more details for GamepadInputSource class
     }
 
-    type AccelerometerCallback = (res: import('cocos/input/types').EventAcceleration) => void;
+    type AccelerometerCallback = (res: import('vision/input/types').EventAcceleration) => void;
     /**
      * Class designed for accelerometer input
      */
@@ -63,6 +63,6 @@ declare module 'pal/input' {
         /**
          * Register the acceleration event callback.
          */
-        public on (eventType: import('cocos/input/types/event-enum').InputEventType, callback: AccelerometerCallback, target?: any);
+        public on (eventType: import('vision/input/types/event-enum').InputEventType, callback: AccelerometerCallback, target?: any);
     }
 }

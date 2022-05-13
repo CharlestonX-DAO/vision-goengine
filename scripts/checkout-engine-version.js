@@ -28,7 +28,7 @@ const fileHandlers = {
         return content;
     },
 
-    './cocos/core/global-exports.ts' (content) {
+    './vision/core/global-exports.ts' (content) {
         const versionRegExp = /engineVersion = '.*'/;
         content = content.replace(versionRegExp, `engineVersion = '${targetEngineVersion}'`);
         return content;

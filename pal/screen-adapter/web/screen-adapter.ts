@@ -1,9 +1,9 @@
 import { EDITOR, TEST } from 'internal:constants';
 import { ConfigOrientation, IScreenOptions, SafeAreaEdge } from 'pal/screen-adapter';
 import { systemInfo } from 'pal/system-info';
-import { warnID } from '../../../cocos/core/platform/debug';
-import { EventTarget } from '../../../cocos/core/event/event-target';
-import { Size } from '../../../cocos/core/math';
+import { warnID } from '../../../vision/core/platform/debug';
+import { EventTarget } from '../../../vision/core/event/event-target';
+import { Size } from '../../../vision/core/math';
 import { Orientation } from '../enum-type';
 import legacyCC from '../../../predefine';
 

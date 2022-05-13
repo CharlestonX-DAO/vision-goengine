@@ -1,3 +1,3 @@
 
 
-export { WebView } from '../cocos/web-view/web-view';
+export { WebView } from '../vision/web-view/web-view';

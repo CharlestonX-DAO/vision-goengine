@@ -1,1 +1,1 @@
-export * from '../cocos/profiler/profiler';
+export * from '../vision/profiler/profiler';

@@ -2,9 +2,9 @@ import { ALIPAY, BAIDU, COCOSPLAY, RUNTIME_BASED, VIVO, WECHAT } from 'internal:
 import { minigame } from 'pal/minigame';
 import { ConfigOrientation, IScreenOptions, SafeAreaEdge } from 'pal/screen-adapter';
 import { systemInfo } from 'pal/system-info';
-import { warnID } from '../../../cocos/core/platform/debug';
-import { EventTarget } from '../../../cocos/core/event/event-target';
-import { Size } from '../../../cocos/core/math';
+import { warnID } from '../../../vision/core/platform/debug';
+import { EventTarget } from '../../../vision/core/event/event-target';
+import { Size } from '../../../vision/core/math';
 import { OS } from '../../system-info/enum-type';
 import { Orientation } from '../enum-type';
 

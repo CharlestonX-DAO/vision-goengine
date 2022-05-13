@@ -1,1 +1,1 @@
-export * from '../../cocos/core/platform/macro';
+export * from '../../vision/core/platform/macro';

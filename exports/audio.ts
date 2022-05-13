@@ -1,3 +1,3 @@
 
 
-export * from '../cocos/audio';
+export * from '../vision/audio';

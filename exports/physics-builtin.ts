@@ -1,5 +1,5 @@
 
 
-import '../cocos/physics/cocos/instantiate';
+import '../vision/physics/vision/instantiate';
 
-export * from '../cocos/physics/framework/physics-interface';
+export * from '../vision/physics/framework/physics-interface';

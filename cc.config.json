@@ -47,18 +47,18 @@
             "test": "context.platform === 'NATIVE'",
             "isVirtualModule": false,
             "overrides": {
-                "cocos/core/pipeline/index.ts": "cocos/core/pipeline/index.jsb.ts",
-                "cocos/core/renderer/core/native-pools.ts": "cocos/core/renderer/core/native-pools.jsb.ts",
-                "cocos/core/gfx/index.ts": "cocos/core/gfx/index.jsb.ts",
-                "cocos/core/gfx/pipeline-state.ts": "cocos/core/gfx/pipeline-state.jsb.ts",
-                "cocos/spine/index.ts": "cocos/spine/index.jsb.ts",
-                "cocos/dragon-bones/index.ts": "cocos/dragon-bones/index.jsb.ts",
-                "cocos/core/renderer/native-scene.ts": "cocos/core/renderer/native-scene.jsb.ts",
-                "cocos/physics/physx/instantiate.ts": "cocos/physics/physx/instantiate.jsb.ts",
-                "cocos/core/math/vec3.ts": "cocos/core/math/vec3.jsb.ts",
-                "cocos/core/math/quat.ts": "cocos/core/math/quat.jsb.ts",
-                "cocos/core/math/mat3.ts": "cocos/core/math/mat3.jsb.ts",
-                "cocos/core/math/mat4.ts": "cocos/core/math/mat4.jsb.ts"
+                "vision/core/pipeline/index.ts": "vision/core/pipeline/index.jsb.ts",
+                "vision/core/renderer/core/native-pools.ts": "vision/core/renderer/core/native-pools.jsb.ts",
+                "vision/core/gfx/index.ts": "vision/core/gfx/index.jsb.ts",
+                "vision/core/gfx/pipeline-state.ts": "vision/core/gfx/pipeline-state.jsb.ts",
+                "vision/spine/index.ts": "vision/spine/index.jsb.ts",
+                "vision/dragon-bones/index.ts": "vision/dragon-bones/index.jsb.ts",
+                "vision/core/renderer/native-scene.ts": "vision/core/renderer/native-scene.jsb.ts",
+                "vision/physics/physx/instantiate.ts": "vision/physics/physx/instantiate.jsb.ts",
+                "vision/core/math/vec3.ts": "vision/core/math/vec3.jsb.ts",
+                "vision/core/math/quat.ts": "vision/core/math/quat.jsb.ts",
+                "vision/core/math/mat3.ts": "vision/core/math/mat3.jsb.ts",
+                "vision/core/math/mat4.ts": "vision/core/math/mat4.jsb.ts"
             }
         },
         {
@@ -109,21 +109,21 @@
             "test": "context.buildTimeConstants && context.buildTimeConstants.NOT_PACK_PHYSX_LIBS",
             "isVirtualModule": false,
             "overrides": {
-                "cocos/physics/physx/physx.asmjs.ts": "cocos/physics/physx/physx.null.ts"
+                "vision/physics/physx/physx.asmjs.ts": "vision/physics/physx/physx.null.ts"
             }
         },
         {
             "test": "!context.buildTimeConstants.MARIONETTE",
             "isVirtualModule": false,
             "overrides": {
-                "cocos/core/animation/marionette/runtime-exports.ts": "cocos/core/animation/marionette/index-empty.ts"
+                "vision/core/animation/marionette/runtime-exports.ts": "vision/core/animation/marionette/index-empty.ts"
             }
         }
     ],
     "includes": [
         "./exports/**/*.{ts,js,json}",
         "./editor/exports/**/*.{ts,js,json}",
-        "./cocos/**/*.{ts,js,json}",
+        "./vision/**/*.{ts,js,json}",
         "./pal/**/*.{ts,js,json}"
     ]
 }

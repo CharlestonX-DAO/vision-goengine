@@ -1,6 +1,6 @@
-import { macro } from '../../cocos/core/platform/macro';
-import { Touch } from '../../cocos/input/types';
-import { Vec2 } from '../../cocos/core/math/vec2';
+import { macro } from '../../vision/core/platform/macro';
+import { Touch } from '../../vision/input/types';
+import { Vec2 } from '../../vision/core/math/vec2';
 
 const tempVec2 = new Vec2();
 

@@ -1,3 +1,3 @@
 
 
-export { waitForAmmoInstantiation as default } from '../cocos/physics/bullet/instantiated';
+export { waitForAmmoInstantiation as default } from '../vision/physics/bullet/instantiated';

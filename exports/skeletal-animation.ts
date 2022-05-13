@@ -1,1 +1,1 @@
-export * from '../cocos/3d/skeletal-animation';
+export * from '../vision/3d/skeletal-animation';

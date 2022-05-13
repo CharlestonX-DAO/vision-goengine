@@ -2,7 +2,7 @@
 
 /// physics namespace ///
 
-import * as physics from '../cocos/physics/framework';
+import * as physics from '../vision/physics/framework';
 import { cclegacy } from './base';
 
 export { physics };
@@ -34,7 +34,7 @@ export {
 
     EAxisDirection,
     ERigidBodyType,
-} from '../cocos/physics/framework';
+} from '../vision/physics/framework';
 
 export type {
     ITriggerEvent,
@@ -44,6 +44,6 @@ export type {
     CollisionCallback,
     TriggerEventType,
     TriggerCallback,
-} from '../cocos/physics/framework';
+} from '../vision/physics/framework';
 
-export * from '../cocos/physics/framework/deprecated';
+export * from '../vision/physics/framework/deprecated';

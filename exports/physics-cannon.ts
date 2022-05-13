@@ -1,7 +1,7 @@
 
 
 import CANNON from '@cocos/cannon';
-import '../cocos/physics/cannon/instantiate';
+import '../vision/physics/cannon/instantiate';
 
 if (window) window.CANNON = CANNON;
 

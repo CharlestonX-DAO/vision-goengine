@@ -1,4 +1,4 @@
 
 
 
-export * from '../cocos/tiledmap';
+export * from '../vision/tiledmap';

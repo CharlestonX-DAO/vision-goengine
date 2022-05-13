@@ -1,4 +1,4 @@
 
 
 
-import '../cocos/physics-2d/builtin/instantiate';
+import '../vision/physics-2d/builtin/instantiate';

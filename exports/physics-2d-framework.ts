@@ -1,4 +1,4 @@
 
 
 
-export * from '../cocos/physics-2d/framework';
+export * from '../vision/physics-2d/framework';

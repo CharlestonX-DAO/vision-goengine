@@ -1,9 +1,9 @@
 import { MouseCallback } from 'pal/input';
 import { screenAdapter } from 'pal/screen-adapter';
-import { EventMouse } from '../../../cocos/input/types';
-import { EventTarget } from '../../../cocos/core/event';
-import { Vec2 } from '../../../cocos/core/math';
-import { InputEventType } from '../../../cocos/input/types/event-enum';
+import { EventMouse } from '../../../vision/input/types';
+import { EventTarget } from '../../../vision/core/event';
+import { Vec2 } from '../../../vision/core/math';
+import { InputEventType } from '../../../vision/input/types/event-enum';
 
 export class MouseInputSource {
     private _eventTarget: EventTarget = new EventTarget();

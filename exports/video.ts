@@ -1,3 +1,3 @@
 
 
-export * from '../cocos/video';
+export * from '../vision/video';

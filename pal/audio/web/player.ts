@@ -1,4 +1,4 @@
-import { warnID } from '../../../cocos/core';
+import { warnID } from '../../../vision/core';
 import { AudioLoadOptions, AudioType, AudioState } from '../type';
 import { AudioPlayerDOM, OneShotAudioDOM } from './player-dom';
 import { AudioContextAgent, AudioPlayerWeb, OneShotAudioWeb } from './player-web';

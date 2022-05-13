@@ -1,11 +1,11 @@
 import { TouchCallback } from 'pal/input';
 import { screenAdapter } from 'pal/screen-adapter';
-import { Size, Vec2 } from '../../../cocos/core/math';
-import { EventTarget } from '../../../cocos/core/event';
-import { EventTouch, Touch } from '../../../cocos/input/types';
+import { Size, Vec2 } from '../../../vision/core/math';
+import { EventTarget } from '../../../vision/core/event';
+import { EventTouch, Touch } from '../../../vision/input/types';
 import { touchManager } from '../touch-manager';
-import { macro } from '../../../cocos/core/platform/macro';
-import { InputEventType } from '../../../cocos/input/types/event-enum';
+import { macro } from '../../../vision/core/platform/macro';
+import { InputEventType } from '../../../vision/input/types/event-enum';
 
 export class TouchInputSource {
     private _eventTarget: EventTarget = new EventTarget();

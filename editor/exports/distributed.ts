@@ -1,1 +1,1 @@
-export * from '../../cocos/core/distributed/utils';
+export * from '../../vision/core/distributed/utils';

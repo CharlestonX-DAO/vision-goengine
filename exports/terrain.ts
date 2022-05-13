@@ -1,3 +1,3 @@
 
 
-export * from '../cocos/terrain';
+export * from '../vision/terrain';

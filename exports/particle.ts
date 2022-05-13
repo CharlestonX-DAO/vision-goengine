@@ -1,3 +1,3 @@
 
 
-export * from '../cocos/particle';
+export * from '../vision/particle';

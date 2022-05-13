@@ -2,10 +2,10 @@ import { MouseCallback } from 'pal/input';
 import { MouseEventData, MouseWheelEventData, minigame } from 'pal/minigame';
 import { screenAdapter } from 'pal/screen-adapter';
 import { systemInfo } from 'pal/system-info';
-import { Vec2 } from '../../../cocos/core/math';
-import { EventTarget } from '../../../cocos/core/event';
-import { EventMouse } from '../../../cocos/input/types';
-import { InputEventType } from '../../../cocos/input/types/event-enum';
+import { Vec2 } from '../../../vision/core/math';
+import { EventTarget } from '../../../vision/core/event';
+import { EventMouse } from '../../../vision/input/types';
+import { InputEventType } from '../../../vision/input/types/event-enum';
 import { Feature } from '../../system-info/enum-type';
 
 export class MouseInputSource {

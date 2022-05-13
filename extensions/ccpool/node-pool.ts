@@ -23,9 +23,9 @@
  THE SOFTWARE.
  */
 
-import { Component } from '../../cocos/core/components/component';
-import { Node } from '../../cocos/core/scene-graph';
-import { legacyCC } from '../../cocos/core/global-exports';
+import { Component } from '../../vision/core/components/component';
+import { Node } from '../../vision/core/scene-graph';
+import { legacyCC } from '../../vision/core/global-exports';
 
 type Constructor<T = {}> = new(...args: any[]) => T;
 

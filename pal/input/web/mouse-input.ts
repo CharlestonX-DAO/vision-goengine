@@ -2,10 +2,10 @@ import { TEST } from 'internal:constants';
 import { MouseCallback } from 'pal/input';
 import { systemInfo } from 'pal/system-info';
 import { screenAdapter } from 'pal/screen-adapter';
-import { EventMouse } from '../../../cocos/input/types';
-import { EventTarget } from '../../../cocos/core/event';
-import { Rect, Vec2 } from '../../../cocos/core/math';
-import { InputEventType } from '../../../cocos/input/types/event-enum';
+import { EventMouse } from '../../../vision/input/types';
+import { EventTarget } from '../../../vision/core/event';
+import { Rect, Vec2 } from '../../../vision/core/math';
+import { InputEventType } from '../../../vision/input/types/event-enum';
 import { Feature } from '../../system-info/enum-type';
 
 export class MouseInputSource {

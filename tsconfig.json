@@ -16,7 +16,7 @@
     "baseUrl": "./",
     "paths": {
         "cc.decorator": [
-            "cocos/core/data/decorators/index.ts"
+            "vision/core/data/decorators/index.ts"
         ]
     },
     "types": [

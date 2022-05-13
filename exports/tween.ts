@@ -1,3 +1,3 @@
 
 
-export * from '../cocos/tween/index';
+export * from '../vision/tween/index';

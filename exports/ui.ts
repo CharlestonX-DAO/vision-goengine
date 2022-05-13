@@ -1,3 +1,3 @@
 
 
-export * from '../cocos/ui';
+export * from '../vision/ui';
