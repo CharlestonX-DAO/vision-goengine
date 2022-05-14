@@ -1,12 +1,10 @@
 {
-  "name": "cocos-creator",
-  "version": "3.5.0",
-  "description": "Cocos Creator is a cross-platform 2D & 3D game engine written in TypeScript, licensed under MIT.",
-  "homepage": "http://www.cocos.com",
+  "name": "vision-goengine",
+  "version": "0.2.0",
+  "description": "Vision Goengine is a cross-platform 2D & 3D game engine written in TypeScript, licensed under MIT.",
+  "homepage": "https://github.com/vision-consensus/vision-goengine",
   "license": "MIT",
-  "authors": [
-    "AUTHORS.txt"
-  ],
+  "authors": ["CHAINDEX"],
   "module": "index.js",
   "scripts": {
     "server": "http-server . -p 8002 -o playground/index.html",
@@ -27,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cocos-creator/engine.git"
+    "url": "git+https://github.com/vision-consensus/vision-goengine.git"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
