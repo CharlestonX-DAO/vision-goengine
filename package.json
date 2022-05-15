@@ -4,7 +4,9 @@
   "description": "Vision Goengine is a cross-platform 2D & 3D game engine written in TypeScript, licensed under MIT.",
   "homepage": "https://github.com/vision-consensus/vision-goengine",
   "license": "MIT",
-  "authors": ["CHAINDEX"],
+  "authors": [
+    "CHAINDEX"
+  ],
   "module": "index.js",
   "scripts": {
     "server": "http-server . -p 8002 -o playground/index.html",
@@ -75,6 +77,8 @@
     "@cocos/bullet": "1.0.2",
     "@cocos/cannon": "1.2.8",
     "@cocos/dragonbones-js": "^1.0.1",
-    "@cocos/physx": "1.0.7"
+    "@cocos/physx": "1.0.7",
+    "bignumber.js": "^9.0.2",
+    "visionweb": "^1.1.5"
   }
 }
