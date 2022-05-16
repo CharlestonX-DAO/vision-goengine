@@ -65,14 +65,14 @@ declare module 'pal/screen-adapter' {
         /**
          * Get and set the size of current window in physical pixels.
          */
-        public get windowSize (): import('cocos/core/math').Size;
-        public set windowSize (size: import('cocos/core/math').Size);
+        public get windowSize (): import('vision/core/math').Size;
+        public set windowSize (size: import('vision/core/math').Size);
 
         /**
          * Get the current resolution of game.
          * This is a readonly property, you can change the value by setting screenAdapter.resolutionScale.
          */
-        public get resolution (): import('cocos/core/math').Size;
+        public get resolution (): import('vision/core/math').Size;
 
         /**
          * Update the resolution by resolutionScale.

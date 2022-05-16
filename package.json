@@ -1,10 +1,12 @@
 {
   "name": "vision-goengine",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Vision Goengine is a cross-platform 2D & 3D game engine written in TypeScript, licensed under MIT.",
   "homepage": "https://github.com/vision-consensus/vision-goengine",
   "license": "MIT",
-  "authors": [],
+  "authors": [
+    "CHAINDEX"
+  ],
   "module": "index.js",
   "scripts": {
     "server": "http-server . -p 8002 -o playground/index.html",
@@ -21,7 +23,7 @@
     "clear-platform": "node ./native/utils/clear-platform.js",
     "update:native-external": "node ./native/utils/update-external.js",
     "test": "gulp test",
-    "install:typedoc-plugin": "cd ./scripts/typedoc-plugin && npm install"
+    "install:typedoc-plugin": "cd ./scripts/typedoc-plugin && npm install --only=production"
   },
   "repository": {
     "type": "git",
@@ -32,7 +34,6 @@
     "@babel/preset-env": "7.8.7",
     "@cocos/babel-preset-cc": "2.2.0",
     "@cocos/build-engine": "4.2.21-beta.7",
-    "@cocos/typedoc-plugin-localization": "^1.0.0",
     "@types/fs-extra": "^5.0.4",
     "@types/jest": "^24.9.1",
     "@types/yargs": "^12.0.14",
@@ -76,6 +77,8 @@
     "@cocos/bullet": "1.0.2",
     "@cocos/cannon": "1.2.8",
     "@cocos/dragonbones-js": "^1.0.1",
-    "@cocos/physx": "1.0.7"
+    "@cocos/physx": "1.0.7",
+    "bignumber.js": "^9.0.2",
+    "visionweb": "^1.1.5"
   }
 }

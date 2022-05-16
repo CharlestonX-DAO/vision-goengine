@@ -1,6 +1,6 @@
 import { DEBUG, EDITOR, TEST } from 'internal:constants';
 import { IFeatureMap } from 'pal/system-info';
-import { EventTarget } from '../../../cocos/core/event';
+import { EventTarget } from '../../../vision/core/event';
 import { BrowserType, NetworkType, OS, Platform, Language, Feature } from '../enum-type';
 
 class SystemInfo extends EventTarget {
@@ -70,12 +70,7 @@ class SystemInfo extends EventTarget {
             iOS = true;
             osVersion = uaResult[2] || '';
             osMajorVersion = parseInt(osVersion) || 0;
-            // refer to https://github.com/cocos-creator/engine/pull/5542 , thanks for contribition from @krapnikkk
-            // ipad OS 13 safari identifies itself as "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 (KHTML, like Gecko)"
-            // so use maxTouchPoints to check whether it's desktop safari or not.
-            // reference: https://stackoverflow.com/questions/58019463/how-to-detect-device-name-in-safari-on-ios-13-while-it-doesnt-show-the-correct
-            // FIXME: should remove it when touch-enabled mac are available
-            // TODO: due to compatibility issues, it is still determined to be ios, and a new operating system type ipados may be added later？
+
         } else if (/(iPhone|iPad|iPod)/.exec(nav.platform) || (nav.platform === 'MacIntel' && nav.maxTouchPoints && nav.maxTouchPoints > 1)) {
             iOS = true;
             osVersion = '';

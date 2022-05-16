@@ -36,10 +36,6 @@ exports.$ = {
     light: 'ui-checkbox',
 };
 
-async function callMaterialPreviewFunction(funcName, ...args) {
-    return await Editor.Message.request('scene', 'call-preview-function', 'scene:material-preview', funcName, ...args);
-}
-
 exports.methods = {
     hideAllContent(hide) {
         this.$.container.style = hide ? 'display:none' : '';
@@ -123,23 +119,23 @@ exports.update = async function(assetList, metaList) {
 exports.ready = async function() {
     const panel = this;
 
-    callMaterialPreviewFunction('setLightEnable', true);
+    Editor.Message.request('scene', 'set-material-preview-light-enable', true);
     panel.$.light.addEventListener('confirm', async () => {
-        await callMaterialPreviewFunction('setLightEnable', this.$.light.checked);
+        await Editor.Message.request('scene', 'set-material-preview-light-enable', this.$.light.checked);
         panel.isPreviewDataDirty = true;
     });
 
-    callMaterialPreviewFunction('setPrimitive', 'box');
+    Editor.Message.request('scene', 'set-material-preview-primitive', 'box');
     panel.$.primitive.addEventListener('confirm', async () => {
-        await callMaterialPreviewFunction('setPrimitive', this.$.primitive.value);
+        await Editor.Message.request('scene', 'set-material-preview-primitive', this.$.primitive.value);
         panel.isPreviewDataDirty = true;
     });
 
     panel.$.canvas.addEventListener('mousedown', async (event) => {
-        await callMaterialPreviewFunction('onMouseDown', { x: event.x, y: event.y });
+        await Editor.Message.request('scene', 'on-material-preview-mouse-down', { x: event.x, y: event.y });
 
         async function mousemove(event) {
-            await callMaterialPreviewFunction('onMouseMove', {
+            await Editor.Message.request('scene', 'on-material-preview-mouse-move', {
                 movementX: event.movementX,
                 movementY: event.movementY,
             });
@@ -148,7 +144,7 @@ exports.ready = async function() {
         }
 
         async function mouseup(event) {
-            await callMaterialPreviewFunction('onMouseUp', {
+            await Editor.Message.request('scene', 'on-material-preview-mouse-up', {
                 x: event.x,
                 y: event.y,
             });
@@ -181,7 +177,7 @@ exports.ready = async function() {
 
 exports.close = function() {
     const panel = this;
-    callMaterialPreviewFunction('hide');
+
     panel.resizeObserver.unobserve(panel.$.container);
     Editor.Message.removeBroadcastListener('material-inspector:change-dump', this.updatePreviewDataDirtyBind);
 };

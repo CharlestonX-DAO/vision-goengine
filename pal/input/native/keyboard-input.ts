@@ -1,8 +1,8 @@
 import { KeyboardCallback } from 'pal/input';
 import { systemInfo } from 'pal/system-info';
-import { KeyCode, EventKeyboard } from '../../../cocos/input/types';
-import { EventTarget } from '../../../cocos/core/event';
-import { InputEventType } from '../../../cocos/input/types/event-enum';
+import { KeyCode, EventKeyboard } from '../../../vision/input/types';
+import { EventTarget } from '../../../vision/core/event';
+import { InputEventType } from '../../../vision/input/types/event-enum';
 
 const nativeKeyCode2KeyCode: Record<number, KeyCode> = {
     12: KeyCode.NUM_LOCK,

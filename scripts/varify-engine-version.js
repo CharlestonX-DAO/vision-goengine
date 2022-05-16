@@ -15,7 +15,7 @@ const branchVersion = matchResult[1];
 
 const versionRegExpMap = {
     './package.json': /"version": "(.*)"/,
-    './cocos/core/global-exports.ts': /engineVersion = '(.*)'/,
+    './vision/core/global-exports.ts': /engineVersion = '(.*)'/,
 };
 for (filePath in versionRegExpMap) {
     const regExp = versionRegExpMap[filePath];

@@ -3,7 +3,6 @@ cc.AssetLibrary.init({
   rawAssetsBase: 'library',
   rawAssets: {
     assets: {
-      // https://github.com/cocos-creator/example-3d/blob/master/show-cases/assets/effects/test.effect
       '97051ce4-0cc9-4ae0-a584-d73943d7c11a': ['test', 'cc.EffectAsset'],
     },
   },

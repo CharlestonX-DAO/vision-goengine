@@ -1,7 +1,7 @@
 import { KeyboardCallback } from 'pal/input';
-import { KeyCode, EventKeyboard } from '../../../cocos/input/types';
-import { EventTarget } from '../../../cocos/core/event';
-import { InputEventType } from '../../../cocos/input/types/event-enum';
+import { KeyCode, EventKeyboard } from '../../../vision/input/types';
+import { EventTarget } from '../../../vision/core/event';
+import { InputEventType } from '../../../vision/input/types/event-enum';
 
 const code2KeyCode: Record<string, KeyCode> = {
     Backspace: KeyCode.BACKSPACE,

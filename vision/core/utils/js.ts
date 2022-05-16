@@ -1,0 +1,141 @@
+
+import * as jsarray from './array';
+import IDGenerator from './id-generator';
+import {
+    _idToClass,
+    _nameToClass,
+    _getClassById,
+    _getClassId,
+    _setClassId,
+    addon,
+    clear,
+    createMap,
+    extend,
+    formatStr,
+    get,
+    getClassByName,
+    getClassName,
+    getPropertyDescriptor,
+    getset,
+    getSuper,
+    isChildClassOf,
+    isNumber,
+    isString,
+    isEmptyObject,
+    mixin,
+    obsolete,
+    obsoletes,
+    set,
+    setClassName,
+    setClassAlias,
+    shiftArguments,
+    unregisterClass,
+    value,
+} from './js-typed';
+import Pool from './pool';
+
+import { legacyCC } from '../global-exports';
+
+export * from './js-typed';
+export { default as IDGenerator } from './id-generator';
+export { default as Pool } from './pool';
+export const array = jsarray;
+
+export const js = {
+    IDGenerator,
+    Pool,
+    array: jsarray,
+    isNumber,
+    isString,
+    isEmptyObject,
+    getPropertyDescriptor,
+    addon,
+    mixin,
+    extend,
+    getSuper,
+    isChildClassOf,
+    clear,
+    value,
+    getset,
+    get,
+    set,
+    unregisterClass,
+    getClassName,
+    setClassName,
+    setClassAlias,
+    getClassByName,
+    /**
+     * @en All classes registered in the engine, indexed by name.
+     * @zh 引擎中已注册的所有类型，通过名称进行索引。
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     * @example
+     * ```
+     * import { js } from 'cc';
+     * // save all registered classes before loading scripts
+     * let builtinClassIds = js._registeredClassIds;
+     * let builtinClassNames = js._registeredClassNames;
+     * // load some scripts that contain CCClass
+     * ...
+     * // clear all loaded classes
+     * js._registeredClassIds = builtinClassIds;
+     * js._registeredClassNames = builtinClassNames;
+     * ```
+     *
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
+    get _registeredClassNames (): typeof _nameToClass {
+        return { ..._nameToClass };
+    },
+    set _registeredClassNames (value: typeof _nameToClass) {
+        clear(_nameToClass);
+        Object.assign(_nameToClass, value);
+    },
+    /**
+     * @en All classes registered in the engine, indexed by ID.
+     * @zh 引擎中已注册的所有类型，通过 ID 进行索引。
+     * @example
+     * ```
+     * import { js } from 'cc';
+     * // save all registered classes before loading scripts
+     * let builtinClassIds = js._registeredClassIds;
+     * let builtinClassNames = js._registeredClassNames;
+     * // load some scripts that contain CCClass
+     * ...
+     * // clear all loaded classes
+     * js._registeredClassIds = builtinClassIds;
+     * js._registeredClassNames = builtinClassNames;
+     * ```
+     *
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
+    get _registeredClassIds (): typeof _idToClass {
+        return { ..._idToClass };
+    },
+    set _registeredClassIds (value: typeof _idToClass) {
+        clear(_idToClass);
+        Object.assign(_idToClass, value);
+    },
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
+    _getClassId,
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
+    _setClassId,
+    /**
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
+     */
+    _getClassById,
+    obsolete,
+    obsoletes,
+    formatStr,
+    shiftArguments,
+    createMap,
+};
+
+/**
+ * @en This module provides some JavaScript utilities. All members can be accessed via `import { js } from 'cc'`.
+ * @zh 这个模块封装了 JavaScript 相关的一些实用函数，你可以通过 `import { js } from 'cc'` 来访问这个模块。
+ */
+legacyCC.js = js;

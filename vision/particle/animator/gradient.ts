@@ -1,0 +1,180 @@
+
+
+
+
+import { ccclass, serializable, editable } from 'cc.decorator';
+import { CCClass } from '../../core/data/class';
+import { Color, lerp, repeat } from '../../core/math';
+import { Enum } from '../../core/value-types';
+
+const Mode = Enum({
+    Blend: 0,
+    Fixed: 1,
+});
+
+export class ColorKey {
+    /**
+     * @en Color value.
+     * @zh 颜色值。
+     */
+    public color = Color.WHITE.clone();
+
+    /**
+     * @en Time value.
+     * @zh 时间值。
+     */
+    public time = 0;
+}
+
+CCClass.fastDefine('cc.ColorKey', ColorKey, {
+    color: Color.WHITE.clone(),
+    time: 0,
+});
+
+CCClass.Attr.setClassAttr(ColorKey, 'color', 'visible', true);
+CCClass.Attr.setClassAttr(ColorKey, 'time', 'visible', true);
+
+export class AlphaKey {
+    /**
+     * @en Alpha value.
+     * @zh 透明度。
+     */
+    public alpha = 1;
+    /**
+     * @en Time.
+     * @zh 时间帧。
+     */
+    public time = 0;
+}
+
+CCClass.fastDefine('cc.AlphaKey', AlphaKey, {
+    alpha: 1,
+    time: 0,
+});
+
+CCClass.Attr.setClassAttr(AlphaKey, 'alpha', 'visible', true);
+CCClass.Attr.setClassAttr(AlphaKey, 'time', 'visible', true);
+
+export default class Gradient {
+    public static Mode = Mode;
+    /**
+     * @en Array of color key.
+     * @zh 颜色关键帧列表。
+     */
+    public colorKeys = new Array<ColorKey>();
+    /**
+     * @en Array of alpha key.
+     * @zh 透明度关键帧列表。
+     */
+    public alphaKeys = new Array<AlphaKey>();
+    /**
+     * @en Blend mode.
+     * @zh 混合模式。
+     */
+    public mode = Mode.Blend;
+
+    private _color: Color;
+
+    constructor () {
+        this._color = Color.WHITE.clone();
+    }
+
+    public setKeys (colorKeys: ColorKey[], alphaKeys: AlphaKey[]) {
+        this.colorKeys = colorKeys;
+        this.alphaKeys = alphaKeys;
+    }
+
+    public sortKeys () {
+        if (this.colorKeys.length > 1) {
+            this.colorKeys.sort((a, b) => a.time - b.time);
+        }
+        if (this.alphaKeys.length > 1) {
+            this.alphaKeys.sort((a, b) => a.time - b.time);
+        }
+    }
+
+    public evaluate (time: number) {
+        this.getRGB(time);
+        this._color._set_a_unsafe(this.getAlpha(time)!);
+        return this._color;
+    }
+
+    public randomColor () {
+        const c = this.colorKeys[Math.trunc(Math.random() * this.colorKeys.length)];
+        const a = this.alphaKeys[Math.trunc(Math.random() * this.alphaKeys.length)];
+        this._color.set(c.color);
+        this._color._set_a_unsafe(a.alpha);
+        return this._color;
+    }
+
+    private getRGB (time: number) {
+        if (this.colorKeys.length > 1) {
+            time = repeat(time, 1);
+            for (let i = 1; i < this.colorKeys.length; ++i) {
+                const preTime = this.colorKeys[i - 1].time;
+                const curTime = this.colorKeys[i].time;
+                if (time >= preTime && time < curTime) {
+                    if (this.mode === Mode.Fixed) {
+                        return this.colorKeys[i].color;
+                    }
+                    const factor = (time - preTime) / (curTime - preTime);
+                    Color.lerp(this._color, this.colorKeys[i - 1].color, this.colorKeys[i].color, factor);
+                    return this._color;
+                }
+            }
+            const lastIndex = this.colorKeys.length - 1;
+            if (time < this.colorKeys[0].time) {
+                Color.lerp(this._color, Color.BLACK, this.colorKeys[0].color, time / this.colorKeys[0].time);
+            } else if (time > this.colorKeys[lastIndex].time) {
+                Color.lerp(this._color, this.colorKeys[lastIndex].color, Color.BLACK, (time - this.colorKeys[lastIndex].time) / (1 - this.colorKeys[lastIndex].time));
+            }
+            // console.warn('something went wrong. can not get gradient color.');
+            return this._color;
+        } else if (this.colorKeys.length === 1) {
+            this._color.set(this.colorKeys[0].color);
+            return this._color;
+        } else {
+            this._color.set(Color.WHITE);
+            return this._color;
+        }
+    }
+
+    private getAlpha (time: number) {
+        const basicAlpha = 0; // default alpha is 0
+        if (this.alphaKeys.length > 1) {
+            time = repeat(time, 1);
+            for (let i = 1; i < this.alphaKeys.length; ++i) {
+                const preTime = this.alphaKeys[i - 1].time;
+                const curTime = this.alphaKeys[i].time;
+                if (time >= preTime && time < curTime) {
+                    if (this.mode === Mode.Fixed) {
+                        return this.alphaKeys[i].alpha;
+                    }
+                    const factor = (time - preTime) / (curTime - preTime);
+                    return lerp(this.alphaKeys[i - 1].alpha, this.alphaKeys[i].alpha, factor);
+                }
+            }
+            const lastIndex = this.alphaKeys.length - 1;
+            if (time < this.alphaKeys[0].time) {
+                return lerp(basicAlpha, this.alphaKeys[0].alpha, time / this.alphaKeys[0].time);
+            } else if (time > this.alphaKeys[lastIndex].time) {
+                return lerp(this.alphaKeys[lastIndex].alpha, basicAlpha, (time - this.alphaKeys[lastIndex].time) / (1 - this.alphaKeys[lastIndex].time));
+            }
+            return 255;
+        } else if (this.alphaKeys.length === 1) {
+            return this.alphaKeys[0].alpha;
+        } else {
+            return 255;
+        }
+    }
+}
+
+CCClass.fastDefine('cc.Gradient', Gradient, {
+    colorKeys: [],
+    alphaKeys: [],
+    mode: Mode.Blend,
+});
+
+CCClass.Attr.setClassAttr(Gradient, 'colorKeys', 'visible', true);
+CCClass.Attr.setClassAttr(Gradient, 'alphaKeys', 'visible', true);
+CCClass.Attr.setClassAttr(Gradient, 'mode', 'visible', true);

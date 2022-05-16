@@ -1,7 +1,7 @@
 import { minigame } from 'pal/minigame';
 import { systemInfo } from 'pal/system-info';
-import { clamp01 } from '../../../cocos/core';
-import { EventTarget } from '../../../cocos/core/event';
+import { clamp01 } from '../../../vision/core';
+import { EventTarget } from '../../../vision/core/event';
 import { audioBufferManager } from '../audio-buffer-manager';
 import AudioTimer from '../audio-timer';
 import { enqueueOperation, OperationInfo, OperationQueueable } from '../operation-queue';
@@ -72,11 +72,11 @@ export class AudioPlayerWeb implements OperationQueueable {
     private _readyToHandleOnShow = false;
 
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _eventTarget: EventTarget = new EventTarget();
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _operationQueue: OperationInfo[] = [];
 

@@ -1,0 +1,312 @@
+
+
+/**
+ * @packageDocumentation
+ * @module animation
+ */
+
+import {
+    ccclass, executeInEditMode, executionOrder, help, menu, tooltip, type, serializable, editable,
+} from 'cc.decorator';
+import { SkinnedMeshRenderer } from '../skinned-mesh-renderer';
+import { Mat4 } from '../../core/math';
+import { DataPoolManager } from './data-pool-manager';
+import { Node } from '../../core/scene-graph/node';
+import { AnimationClip } from '../../core/animation/animation-clip';
+import { Animation } from '../../core/animation/animation-component';
+import { SkelAnimDataHub } from './skeletal-animation-data-hub';
+import { SkeletalAnimationState } from './skeletal-animation-state';
+import { getWorldTransformUntilRoot } from '../../core/animation/transform-utils';
+import { legacyCC } from '../../core/global-exports';
+import { js } from '../../core/utils/js';
+import type { AnimationState } from '../../core/animation/animation-state';
+import { assertIsTrue } from '../../core/data/utils/asserts';
+import { getGlobalAnimationManager } from '../../core/animation/global-animation-manager';
+
+@ccclass('cc.SkeletalAnimation.Socket')
+export class Socket {
+    /**
+     * @en Path of the target joint.
+     * @zh 此挂点的目标骨骼路径。
+     */
+    @serializable
+    @editable
+    public path = '';
+
+    /**
+     * @en Transform output node.
+     * @zh 此挂点的变换信息输出节点。
+     */
+    @type(Node)
+    public target: Node | null = null;
+
+    constructor (path = '', target: Node | null = null) {
+        this.path = path;
+        this.target = target;
+    }
+}
+
+js.setClassAlias(Socket, 'cc.SkeletalAnimationComponent.Socket');
+
+const m4_1 = new Mat4();
+const m4_2 = new Mat4();
+
+function collectRecursively (node: Node, prefix = '', out: string[] = []) {
+    for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        if (!child) { continue; }
+        const path = prefix ? `${prefix}/${child.name}` : child.name;
+        out.push(path);
+        collectRecursively(child, path, out);
+    }
+    return out;
+}
+
+/**
+ * @en
+ * Skeletal animation component, offers the following features on top of [[Animation]]:
+ * * Choice between baked animation and real-time calculation, to leverage efficiency and expressiveness.
+ * * Joint socket system: Create any socket node directly under the animation component root node,
+ *   find your target joint and register both to the socket list, so that the socket node would be in-sync with the joint.
+ * @zh
+ * 骨骼动画组件，在普通动画组件基础上额外提供以下功能：
+ * * 可选预烘焙动画模式或实时计算模式，用以权衡运行时效率与效果；
+ * * 提供骨骼挂点功能：通过在动画根节点下创建挂点节点，并在骨骼动画组件上配置 socket 列表，挂点节点的 Transform 就能与骨骼保持同步。
+ */
+@ccclass('cc.SkeletalAnimation')
+@help('i18n:cc.SkeletalAnimation')
+@executionOrder(99)
+@executeInEditMode
+@menu('Animation/SkeletalAnimation')
+export class SkeletalAnimation extends Animation {
+    public static Socket = Socket;
+
+    /**
+     * @en
+     * The joint sockets this animation component maintains.<br>
+     * Sockets have to be registered here before attaching custom nodes to animated joints.
+     * @zh
+     * 当前动画组件维护的挂点数组。要挂载自定义节点到受动画驱动的骨骼上，必须先在此注册挂点。
+     */
+    @type([Socket])
+    @tooltip('i18n:animation.sockets')
+    get sockets () {
+        return this._sockets;
+    }
+
+    set sockets (val) {
+        if (!this._useBakedAnimation) {
+            const animMgr = getGlobalAnimationManager();
+            animMgr.removeSockets(this.node, this._sockets);
+            animMgr.addSockets(this.node, val);
+        }
+        this._sockets = val;
+        this.rebuildSocketAnimations();
+    }
+
+    /**
+     * @en
+     * Whether to bake animations. Default to true,<br>
+     * which substantially increases performance while making all animations completely fixed.<br>
+     * Dynamically changing this property will take effect when playing the next animation clip.
+     * @zh
+     * 是否使用预烘焙动画，默认启用，可以大幅提高运行效时率，但所有动画效果会被彻底固定，不支持任何形式的编辑和混合。<br>
+     * 运行时动态修改此选项会在播放下一条动画片段时生效。
+     */
+    @tooltip('i18n:animation.use_baked_animation')
+    get useBakedAnimation () {
+        return this._useBakedAnimation;
+    }
+
+    set useBakedAnimation (val) {
+        this._useBakedAnimation = val;
+
+        for (const stateName in this._nameToState) {
+            const state = this._nameToState[stateName] as SkeletalAnimationState;
+            state.setUseBaked(val);
+        }
+
+        this._users.forEach((user) => {
+            user.setUseBakedAnimation(val);
+        });
+
+        if (this._useBakedAnimation) {
+            getGlobalAnimationManager().removeSockets(this.node, this._sockets);
+        } else {
+            getGlobalAnimationManager().addSockets(this.node, this._sockets);
+            this._currentBakedState = null;
+        }
+    }
+
+    @serializable
+    protected _useBakedAnimation = true;
+
+    @type([Socket])
+    protected _sockets: Socket[] = [];
+
+    public onLoad () {
+        super.onLoad();
+        // Actively search for potential users and notify them that an animation is usable.
+        const comps = this.node.getComponentsInChildren(SkinnedMeshRenderer);
+        for (let i = 0; i < comps.length; ++i) {
+            const comp = comps[i];
+            if (comp.skinningRoot === this.node) {
+                this.notifySkinnedMeshAdded(comp);
+            }
+        }
+    }
+
+    public onDestroy () {
+        super.onDestroy();
+        (legacyCC.director.root.dataPoolManager as DataPoolManager).jointAnimationInfo.destroy(this.node.uuid);
+        getGlobalAnimationManager().removeSockets(this.node, this._sockets);
+        this._removeAllUsers();
+    }
+
+    public start () {
+        this.sockets = this._sockets;
+        this.useBakedAnimation = this._useBakedAnimation;
+        super.start();
+    }
+
+    public pause () {
+        if (!this._useBakedAnimation) {
+            super.pause();
+        } else {
+            this._currentBakedState?.pause();
+        }
+    }
+
+    public resume () {
+        if (!this._useBakedAnimation) {
+            super.resume();
+        } else {
+            this._currentBakedState?.resume();
+        }
+    }
+
+    public stop () {
+        if (!this._useBakedAnimation) {
+            super.stop();
+        } else if (this._currentBakedState) {
+            this._currentBakedState.stop();
+            this._currentBakedState = null;
+        }
+    }
+
+    public querySockets () {
+        const animPaths = (this._defaultClip && Object.keys(SkelAnimDataHub.getOrExtract(this._defaultClip).joints).sort()
+            .reduce((acc, cur) => (cur.startsWith(acc[acc.length - 1]) ? acc : (acc.push(cur), acc)), [] as string[])) || [];
+        if (!animPaths.length) { return ['please specify a valid default animation clip first']; }
+        const out: string[] = [];
+        for (let i = 0; i < animPaths.length; i++) {
+            const path = animPaths[i];
+            const node = this.node.getChildByPath(path);
+            if (!node) { continue; }
+            out.push(path);
+            collectRecursively(node, path, out);
+        }
+        return out;
+    }
+
+    public rebuildSocketAnimations () {
+        for (const socket of this._sockets) {
+            const joint = this.node.getChildByPath(socket.path);
+            const { target } = socket;
+            if (joint && target) {
+                target.name = `${socket.path.substring(socket.path.lastIndexOf('/') + 1)} Socket`;
+                target.parent = this.node;
+                getWorldTransformUntilRoot(joint, this.node, m4_1);
+                Mat4.fromRTS(m4_2, target.rotation, target.position, target.scale);
+                if (!Mat4.equals(m4_2, m4_1)) { target.matrix = m4_1; }
+            }
+        }
+        for (const stateName of Object.keys(this._nameToState)) {
+            const state = this._nameToState[stateName] as SkeletalAnimationState;
+            state.rebuildSocketCurves(this._sockets);
+        }
+    }
+
+    public createSocket (path: string) {
+        const socket = this._sockets.find((s) => s.path === path);
+        if (socket) { return socket.target; }
+        const joint = this.node.getChildByPath(path);
+        if (!joint) { console.warn('illegal socket path'); return null; }
+        const target = new Node();
+        target.parent = this.node;
+        this._sockets.push(new Socket(path, target));
+        this.rebuildSocketAnimations();
+        return target;
+    }
+
+    /**
+     * @internal This method only friends to skinned mesh renderer.
+     */
+    public notifySkinnedMeshAdded (skinnedMeshRenderer: SkinnedMeshRenderer) {
+        const { _useBakedAnimation: useBakedAnimation } = this;
+        const formerBound = skinnedMeshRenderer.associatedAnimation;
+        if (formerBound) {
+            formerBound._users.delete(skinnedMeshRenderer);
+        }
+        skinnedMeshRenderer.associatedAnimation = this;
+        skinnedMeshRenderer.setUseBakedAnimation(useBakedAnimation, true);
+        if (useBakedAnimation) {
+            const { _currentBakedState: playingState } = this;
+            if (playingState) {
+                skinnedMeshRenderer.uploadAnimation(playingState.clip);
+            }
+        }
+        this._users.add(skinnedMeshRenderer);
+    }
+
+    /**
+     * @internal This method only friends to skinned mesh renderer.
+     */
+    public notifySkinnedMeshRemoved (skinnedMeshRenderer: SkinnedMeshRenderer) {
+        assertIsTrue(skinnedMeshRenderer.associatedAnimation === this);
+        skinnedMeshRenderer.setUseBakedAnimation(false);
+        skinnedMeshRenderer.associatedAnimation = null;
+        this._users.delete(skinnedMeshRenderer);
+    }
+
+    /**
+     * Get all users.
+     * @internal This method only friends to the skeleton animation state.
+     */
+    public getUsers () {
+        return this._users;
+    }
+
+    protected _createState (clip: AnimationClip, name?: string) {
+        return new SkeletalAnimationState(clip, name);
+    }
+
+    protected _doCreateState (clip: AnimationClip, name: string) {
+        const state = super._doCreateState(clip, name) as SkeletalAnimationState;
+        state.rebuildSocketCurves(this._sockets);
+        return state;
+    }
+
+    protected doPlayOrCrossFade (state: AnimationState, duration: number) {
+        if (this._useBakedAnimation) {
+            if (this._currentBakedState) {
+                this._currentBakedState.stop();
+            }
+            const skeletalAnimationState = state as SkeletalAnimationState;
+            this._currentBakedState = skeletalAnimationState;
+            skeletalAnimationState.play();
+        } else {
+            super.doPlayOrCrossFade(state, duration);
+        }
+    }
+
+    private _users = new Set<SkinnedMeshRenderer>();
+
+    private _currentBakedState: SkeletalAnimationState | null = null;
+
+    private _removeAllUsers () {
+        Array.from(this._users).forEach((user) => {
+            this.notifySkinnedMeshRemoved(user);
+        });
+    }
+}

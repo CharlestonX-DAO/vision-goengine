@@ -11,9 +11,9 @@ program
 
 const mode = 'commonjs';
 const docsName = 'Cocos-Creator-API';
-const exclude = '"**/cocos/**/+(webgl|webgl2|utils|builtin|renderer|scene|models|misc|ammo|shapes|constraint|cannon|graphics|profiler|shader-sources|physx|spec|box2d)/*.ts"';
+const exclude = '"**/vision/**/+(webgl|webgl2|utils|builtin|renderer|scene|models|misc|ammo|shapes|constraint|cannon|graphics|profiler|shader-sources|physx|spec|box2d)/*.ts"';
 const readme = 'none';
-//const exclude = '"**/cocos/**/index.ts"';
+//const exclude = '"**/vision/**/index.ts"';
 
 exports.generateJson = function () {
     const index = program.index;

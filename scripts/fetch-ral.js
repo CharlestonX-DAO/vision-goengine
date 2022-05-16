@@ -134,29 +134,3 @@ async function removeDir (dirPath) {
     console.log(`Remove ral directory: '${dirPath}'\n`);
     await del(dirPath, { force: true });
 }
-
-(async () => {
-    try {
-        console.time('Fetch RAL');
-        if (checkFile() && matchCommit()) {
-            console.log('Skip fetching ral!\n');
-            console.timeEnd('Fetch RAL');
-            process.exit(0);
-        }
-        await cleanOldRal();
-        await removeDir(repositoryPath);
-        await runCommand('git clone https://gitlab.cocos.net/publics/runtime-web-adapter', __dirname);
-        await runCommand('git checkout for-creator-3', repositoryPath);
-        await runCommand(`git reset --hard ${readJsonSync(targetCommitFile).commit}`, repositoryPath);
-        await runCommand('npm install', repositoryPath);
-        await runCommand('gulp', repositoryPath);
-        copyRal();
-        writeLocalCommitFile();
-        await removeDir(repositoryPath);
-        console.timeEnd('Fetch RAL');
-        process.exit(0);
-    } catch (err) {
-        console.error('Fetch ral failed', err);
-        process.exit(1);
-    }
-})();

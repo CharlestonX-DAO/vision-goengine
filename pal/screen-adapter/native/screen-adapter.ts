@@ -1,6 +1,6 @@
 import { ConfigOrientation, IScreenOptions, SafeAreaEdge } from 'pal/screen-adapter';
-import { EventTarget } from '../../../cocos/core/event/event-target';
-import { Size } from '../../../cocos/core/math';
+import { EventTarget } from '../../../vision/core/event/event-target';
+import { Size } from '../../../vision/core/math';
 import { Orientation } from '../enum-type';
 
 // these value is defined in the native layer

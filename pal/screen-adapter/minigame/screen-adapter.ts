@@ -2,9 +2,9 @@ import { ALIPAY, BAIDU, COCOSPLAY, RUNTIME_BASED, VIVO, WECHAT } from 'internal:
 import { minigame } from 'pal/minigame';
 import { ConfigOrientation, IScreenOptions, SafeAreaEdge } from 'pal/screen-adapter';
 import { systemInfo } from 'pal/system-info';
-import { warnID } from '../../../cocos/core/platform/debug';
-import { EventTarget } from '../../../cocos/core/event/event-target';
-import { Size } from '../../../cocos/core/math';
+import { warnID } from '../../../vision/core/platform/debug';
+import { EventTarget } from '../../../vision/core/event/event-target';
+import { Size } from '../../../vision/core/math';
 import { OS } from '../../system-info/enum-type';
 import { Orientation } from '../enum-type';
 
@@ -47,7 +47,7 @@ class ScreenAdapter extends EventTarget {
         const sysInfo = minigame.getSystemInfoSync();
         // NOTE: screen size info on these platforms is in physical pixel.
         // No need to multiply with DPR.
-        const dpr = ((ALIPAY && systemInfo.os === OS.ANDROID) || VIVO) ? 1 : this.devicePixelRatio;
+        const dpr = VIVO ? 1 : this.devicePixelRatio;
         let screenWidth = sysInfo.screenWidth;
         let screenHeight = sysInfo.screenHeight;
         if (ALIPAY && rotateLandscape  && screenWidth < screenHeight) {

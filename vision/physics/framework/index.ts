@@ -1,0 +1,65 @@
+
+
+
+
+import { PhysicsSystem } from './physics-system';
+import { PhysicsMaterial } from './assets/physics-material';
+import { PhysicsRayResult } from './physics-ray-result';
+import { BoxCollider } from './components/colliders/box-collider';
+import { Collider } from './components/colliders/collider';
+import { SphereCollider } from './components/colliders/sphere-collider';
+import { CapsuleCollider } from './components/colliders/capsule-collider';
+import { CylinderCollider } from './components/colliders/cylinder-collider';
+import { ConeCollider } from './components/colliders/cone-collider';
+import { MeshCollider } from './components/colliders/mesh-collider';
+import { RigidBody } from './components/rigid-body';
+import { ConstantForce } from './components/constant-force';
+import { TerrainCollider } from './components/colliders/terrain-collider';
+import { SimplexCollider } from './components/colliders/simplex-collider';
+import { PlaneCollider } from './components/colliders/plane-collider';
+
+// constraints
+import { Constraint } from './components/constraints/constraint';
+import { HingeConstraint } from './components/constraints/hinge-constraint';
+import { PointToPointConstraint } from './components/constraints/point-to-point-constraint';
+
+import { legacyCC } from '../../core/global-exports';
+import { selector } from './physics-selector';
+import * as utils from '../utils/util';
+
+export {
+    PhysicsSystem,
+    PhysicsRayResult,
+
+    Collider,
+    BoxCollider,
+    SphereCollider,
+    CapsuleCollider,
+    MeshCollider,
+    CylinderCollider,
+    ConeCollider,
+    TerrainCollider,
+    SimplexCollider,
+    PlaneCollider,
+
+    Constraint,
+    HingeConstraint,
+    PointToPointConstraint,
+
+    RigidBody,
+    PhysicsMaterial,
+    ConstantForce,
+
+    selector,
+    utils,
+};
+
+legacyCC.PhysicsSystem = PhysicsSystem;
+
+legacyCC.PhysicsMaterial = PhysicsMaterial;
+legacyCC.PhysicsRayResult = PhysicsRayResult;
+legacyCC.ConstantForce = ConstantForce;
+
+export * from './physics-interface';
+export * from './physics-config';
+export * from './physics-enum';

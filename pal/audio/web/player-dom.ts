@@ -1,7 +1,7 @@
 import { systemInfo } from 'pal/system-info';
 import { AudioEvent, AudioState, AudioType } from '../type';
-import { EventTarget } from '../../../cocos/core/event';
-import { clamp, clamp01 } from '../../../cocos/core';
+import { EventTarget } from '../../../vision/core/event';
+import { clamp, clamp01 } from '../../../vision/core';
 import { enqueueOperation, OperationInfo, OperationQueueable } from '../operation-queue';
 import { BrowserType, OS } from '../../system-info/enum-type';
 
@@ -68,11 +68,11 @@ export class AudioPlayerDOM implements OperationQueueable {
     private _onEnded: () => void;
 
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _eventTarget: EventTarget = new EventTarget();
     /**
-     * @legacyPublic
+     * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
     public _operationQueue: OperationInfo[] = [];
 
