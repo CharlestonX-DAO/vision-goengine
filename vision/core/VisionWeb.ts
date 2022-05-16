@@ -20,6 +20,31 @@ interface IAccount {
 }
 
 interface IVisionWeb {
+    // TODO
+    readonly TransactionBuilder;
+    readonly Vs;
+    readonly Contract;
+    readonly Plugin;
+    readonly Event;
+    readonly version;
+
+    event;
+    transactionBuilder;
+    vs;
+    plugin;
+    utils;
+    providers;
+    BigNumber;
+    defaultBlock: number | Boolean;
+    defaultPrivateKey: string | Boolean;
+    defaultAddress: {
+        hex: string | Boolean;
+        base58: string | Boolean;
+    }
+    fullnodeVersion: string;
+    feeLimit: number;
+    injectPromise;
+
     new(option: Object | string, solidityNode?: string, eventServer?:string, sideOptions?: Object | string, privateKey?: string);
 
     getFullnodeVersion: () => string;
